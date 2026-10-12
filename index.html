@@ -1,0 +1,1238 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body>
+<title>Question Bank</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one narrow column. Segmented mode switch on top, index-card surfaces below.
+   Colour: cool slate paper, ink text, cobalt accent, vermilion card rule, highlighter for the answer side. */
+:root{
+  --bg:#EDF0F3; --surface:#FFFFFF; --surface-2:#F5F7F9; --ink:#17212C; --ink-2:#4B5968; --ink-3:#6E7B88;
+  --line:#D5DBE2; --rule:#DCE6F2; --accent:#1B4FD8; --accent-ink:#FFFFFF; --accent-soft:#E3EBFD;
+  --mark:#D6452F; --flag:#B45309; --hl:#FFE27A; --good:#17794E; --good-soft:#DDF2E7; --bad:#B8331F; --bad-soft:#FBE3DE;
+  --f-display:'Familjen Grotesk','Helvetica Neue',Arial,sans-serif;
+  --f-body:'Instrument Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F141A; --surface:#171E26; --surface-2:#1D252F; --ink:#E8EDF2; --ink-2:#A9B5C1; --ink-3:#8793A0;
+    --line:#2B3541; --rule:#26313D; --accent:#7EA2FF; --accent-ink:#0B1220; --accent-soft:#1E2A47;
+    --mark:#F0735F; --flag:#F5B042; --hl:#E8C547; --good:#4CC38A; --good-soft:#173528; --bad:#FF8C78; --bad-soft:#3A1E19;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F141A; --surface:#171E26; --surface-2:#1D252F; --ink:#E8EDF2; --ink-2:#A9B5C1; --ink-3:#8793A0;
+  --line:#2B3541; --rule:#26313D; --accent:#7EA2FF; --accent-ink:#0B1220; --accent-soft:#1E2A47;
+  --mark:#F0735F; --flag:#F5B042; --hl:#E8C547; --good:#4CC38A; --good-soft:#173528; --bad:#FF8C78; --bad-soft:#3A1E19;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 var(--f-body);-webkit-font-smoothing:antialiased}
+.app{max-width:760px;margin:0 auto;padding-inline:16px;padding-block:20px 56px}
+h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:-.01em;line-height:1.2}
+p{margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+[hidden]{display:none!important}
+.mono{font-family:var(--f-mono);font-size:.76rem;letter-spacing:.04em;font-variant-numeric:tabular-nums}
+
+/* top bar */
+
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:4px;background:var(--surface);border:1px solid var(--line);border-radius:10px;margin-bottom:22px}
+.tab{border:0;background:transparent;padding:9px 6px;border-radius:7px;cursor:pointer;font-weight:600;font-size:.92rem;color:var(--ink-2);display:flex;gap:7px;justify-content:center;align-items:baseline;min-width:0}
+.tab small{font:500 .7rem var(--f-mono);opacity:.75}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
+
+/* buttons and fields */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:9px 14px;border-radius:8px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-weight:600;font-size:.9rem;line-height:1.2}
+.btn:hover:not(:disabled){border-color:var(--ink-3)}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover:not(:disabled){filter:brightness(1.08)}
+.btn.good{background:var(--good);border-color:var(--good);color:var(--accent-ink)}
+.btn.learn{background:color-mix(in srgb,var(--hl) 35%,var(--surface));border-color:var(--hl)}
+.btn.ghost{background:transparent}
+.btn.small{padding:6px 10px;font-size:.8rem}
+.btn.danger{border-color:var(--bad);color:var(--bad);background:var(--bad-soft)}
+.btn.wide{width:100%;padding:12px 16px}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field>span,.lbl-s{font:500 .68rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2)}
+select,input[type="search"],input[type="text"],textarea{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:9px 12px;min-width:0;width:100%}
+select{padding-right:8px}
+.numin{max-width:9rem;font-variant-numeric:tabular-nums}
+.tags{display:inline-flex;flex-wrap:wrap;gap:6px;align-items:center;min-width:0}
+.src{font:500 .66rem var(--f-mono);letter-spacing:.06em;text-transform:uppercase;padding:1px 7px;border-radius:4px;border:1px solid var(--accent);color:var(--accent);white-space:nowrap}
+.src.real{background:var(--hl);border-color:transparent;color:#1B1500;font-weight:600}
+.src.sample{background:var(--good-soft);border-color:var(--good);color:var(--good);font-weight:600}
+.seg button:disabled{opacity:.5;cursor:default}
+.tag-retry{font:500 .66rem var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--bad);background:var(--bad-soft);border:1px solid var(--bad);padding:0 6px;border-radius:4px}
+textarea{font-family:var(--f-mono);font-size:.8rem;line-height:1.5;resize:vertical;min-height:11rem}
+.check{display:inline-flex;align-items:center;gap:8px;font-size:.9rem;color:var(--ink-2);cursor:pointer;padding-bottom:9px}
+.check input{accent-color:var(--accent);width:16px;height:16px;margin:0}
+
+/* library */
+.lib-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.lib-head h2{font-size:1.5rem}
+.sub{color:var(--ink-2);font-size:.9rem;margin-top:2px}
+.lib-actions{display:flex;gap:8px;flex-wrap:wrap}
+.toolbar{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,14rem) minmax(0,11rem);gap:8px;margin-bottom:12px}
+.toolbar.hasflag{grid-template-columns:minmax(0,1fr) minmax(0,12rem) minmax(0,10rem) auto}
+#lib-flag:empty{display:none}
+.import{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:14px;display:flex;flex-direction:column;gap:12px}
+.import h3{font-size:1.05rem}
+.import .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.import pre{margin:0;padding:12px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;overflow-x:auto;font:400 .74rem/1.55 var(--f-mono)}
+.msg{font-size:.88rem;color:var(--ink-2)}
+.msg.err{color:var(--bad)}
+.msg.ok{color:var(--good)}
+.qlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.qact{display:flex;flex-direction:column;gap:6px;flex:none}
+.qitem.editing{display:block;border-color:var(--accent)}
+.edwrap{background:var(--surface);border:1px solid var(--accent);border-radius:10px;padding:16px;margin-bottom:12px}
+.editor{display:flex;flex-direction:column;gap:12px;width:100%}
+.editor h3{font-size:1.05rem}
+.editor textarea{min-height:0;font-family:inherit;font-size:.95rem;line-height:1.45}
+.editor .wrongs{display:flex;flex-direction:column;gap:6px}
+.editor .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.editor .row{display:flex;gap:8px;flex-wrap:wrap}
+.editor .msg:empty{display:none}
+.qitem{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.qbody{min-width:0;display:flex;flex-direction:column;gap:6px;flex:1}
+.qmeta{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;color:var(--ink-2)}
+.topic{font-size:.74rem;font-weight:600;color:var(--accent);background:var(--accent-soft);padding:1px 8px;border-radius:99px}
+.tag-ex{font:500 .66rem var(--f-mono);letter-spacing:.06em;text-transform:uppercase;border:1px dashed var(--ink-3);color:var(--ink-2);padding:0 6px;border-radius:4px}
+.st{font:500 .66rem var(--f-mono);letter-spacing:.06em;text-transform:uppercase}
+.st.known{color:var(--good)}
+.st.again{color:var(--bad)}
+.qtext{font-weight:600;overflow-wrap:anywhere}
+.atext{color:var(--ink-2);font-size:.92rem;overflow-wrap:anywhere}
+.atext .lbl{display:inline-block;margin-right:8px;font:500 .68rem var(--f-mono);color:var(--ink);background:color-mix(in srgb,var(--hl) 55%,transparent);padding:0 5px;border-radius:3px}
+.notice{background:var(--surface);border:1px dashed var(--ink-3);border-radius:10px;padding:22px 18px;display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+.notice h3{font-size:1.15rem}
+.notice p{color:var(--ink-2);max-width:60ch}
+.skel{height:78px;border-radius:8px;background:var(--surface);border:1px solid var(--line);opacity:.7}
+
+/* mode options row */
+.opts{display:flex;gap:6px 18px;flex-wrap:wrap;align-items:flex-end;margin-bottom:16px}
+.opts .field{flex:1 1 12rem}
+.prog{display:flex;justify-content:space-between;color:var(--ink-2);margin-bottom:6px}
+.bar{height:5px;background:var(--line);border-radius:3px;overflow:hidden;margin-bottom:16px}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:3px;transition:width .3s}
+
+/* index card */
+.card3d{perspective:1400px;cursor:pointer;border-radius:6px;margin-bottom:14px;-webkit-tap-highlight-color:transparent}
+.card{display:grid;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.3,.7,.2,1);min-height:21rem}
+.card.flipped{transform:rotateY(180deg)}
+.face{grid-area:1/1;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;flex-direction:column;
+  background-color:var(--surface);border:1px solid var(--line);border-radius:6px;box-shadow:0 1px 0 var(--line),0 10px 24px -14px rgba(10,20,40,.35);overflow:hidden;min-width:0}
+.face.back{transform:rotateY(180deg);background-color:color-mix(in srgb,var(--hl) 13%,var(--surface))}
+.face-top{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 18px 10px;border-bottom:2px solid var(--mark);color:var(--ink-2);flex-wrap:wrap}
+.face-body{flex:1;padding:12px 18px 8px;display:flex;flex-direction:column;justify-content:center;gap:12px;
+  background-image:linear-gradient(var(--rule) 1px,transparent 1px);background-size:100% 2.4rem;background-position:0 1.1rem}
+.big{font-family:var(--f-display);font-weight:600;font-size:clamp(1.25rem,4.6vw,1.65rem);line-height:2.4rem;overflow-wrap:anywhere;text-wrap:pretty}
+.note{font-size:.95rem;line-height:2.4rem;color:var(--ink-2);overflow-wrap:anywhere}
+.face-foot{padding:8px 18px 12px;color:var(--ink-3);font:500 .7rem var(--f-mono);letter-spacing:.06em;text-transform:uppercase}
+.fc-nav{display:grid;grid-template-columns:4rem 1fr 4rem;gap:8px;margin-bottom:8px}
+.btn.arrow{font-size:1.35rem;line-height:1;padding:10px 0;min-height:48px}
+.btn.arrow svg{width:22px;height:22px;display:block}
+.qz-nav{display:grid;grid-template-columns:4rem 1fr;gap:8px;margin-top:14px}
+.qz-nav .btn.primary{padding:12px 16px}
+.nav-hint{margin-top:8px;color:var(--ink-3);font:500 .68rem var(--f-mono);letter-spacing:.06em;text-transform:uppercase;text-align:center}
+.fc-grade{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.kbd{font:500 .66rem var(--f-mono);opacity:.7;border:1px solid currentColor;border-radius:4px;padding:0 5px}
+.summary{display:flex;gap:10px;flex-wrap:wrap}
+.summary .btn{flex:1 1 12rem}
+
+/* quiz */
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{border:1px solid var(--line);background:var(--surface);padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:600;font-size:.9rem;font-variant-numeric:tabular-nums}
+.seg button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.setup{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:16px}
+.setup h2{font-size:1.4rem}
+.qcard{background:var(--surface);border:1px solid var(--line);border-radius:6px;overflow:hidden;box-shadow:0 10px 24px -16px rgba(10,20,40,.35)}
+.qcard .face-top{background:transparent}
+.qcard-body{padding:18px;display:flex;flex-direction:column;gap:16px}
+.qtitle{font-size:clamp(1.2rem,4.4vw,1.55rem);font-weight:600;overflow-wrap:anywhere;text-wrap:pretty}
+.choices{display:flex;flex-direction:column;gap:8px}
+.choice{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;padding:12px 14px;border:1.5px solid var(--line);background:var(--surface);border-radius:8px;cursor:pointer;min-width:0}
+.choice .key{flex:none;width:26px;height:26px;border-radius:5px;border:1px solid var(--line);display:grid;place-items:center;font:500 .75rem var(--f-mono);color:var(--ink-2);background:var(--surface-2)}
+.choice .ctext{min-width:0;overflow-wrap:anywhere;padding-top:2px}
+.choice:hover:not(:disabled){border-color:var(--accent)}
+.choice:disabled{cursor:default;color:inherit}
+.choice.is-right{border-color:var(--good);background:var(--good-soft)}
+.choice.is-right .key{background:var(--good);border-color:var(--good);color:var(--accent-ink)}
+.choice.is-wrong{border-color:var(--bad);background:var(--bad-soft)}
+.choice.is-wrong .key{background:var(--bad);border-color:var(--bad);color:var(--accent-ink)}
+.choice.is-dim{opacity:.55}
+.feedback{border-left:4px solid var(--good);background:var(--good-soft);padding:10px 14px;border-radius:0 8px 8px 0;display:flex;flex-direction:column;gap:2px;font-size:.93rem}
+.feedback.no{border-color:var(--bad);background:var(--bad-soft)}
+.feedback strong{font-family:var(--f-display);font-size:1.02rem}
+.score-big{font-family:var(--f-display);font-weight:700;font-size:clamp(3rem,16vw,4.6rem);line-height:1;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.score-big small{font-size:.4em;color:var(--ink-2);font-weight:500;letter-spacing:0}
+.missed{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none}
+.missed li{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--surface);display:flex;flex-direction:column;gap:3px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;font-size:.88rem;max-width:calc(100vw - 32px);z-index:20}
+/* question map: one numbered box per question, green when answered correctly and red when not */
+.qz-layout{display:grid;gap:16px;align-items:start}
+.qz-main{min-width:0}
+.qz-map{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;max-height:230px;overflow:auto}
+.qz-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(36px,1fr));gap:6px}
+.qz-dot{height:34px;padding:0;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);font:500 .8rem var(--f-mono);font-variant-numeric:tabular-nums;cursor:pointer;display:grid;place-items:center}
+.qz-dot:hover{border-color:var(--ink-3)}
+.qz-dot.ok{background:var(--good);border-color:var(--good);color:var(--accent-ink)}
+.qz-dot.no{background:var(--bad);border-color:var(--bad);color:var(--accent-ink)}
+.qz-dot[aria-current="step"]{outline:2px solid var(--accent);outline-offset:2px;font-weight:700}
+@media (min-width:900px){
+  .app.qz-run{max-width:1040px}
+  .qz-layout{grid-template-columns:minmax(0,1fr) 232px;gap:20px}
+  .qz-map{position:sticky;top:16px;max-height:calc(100vh - 32px)}
+}
+/* flags: a question you want to come back to */
+.flagbtn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);border-radius:8px;padding:4px 9px;cursor:pointer;font:600 .78rem var(--f-body);line-height:1.2}
+.flagbtn svg{width:15px;height:15px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.flagbtn:hover:not(:disabled){border-color:var(--flag);color:var(--flag)}
+.flagbtn[aria-pressed="true"]{border-color:var(--flag);color:var(--flag);background:color-mix(in srgb,var(--flag) 14%,var(--surface))}
+.flagbtn[aria-pressed="true"] svg{fill:currentColor}
+.flagbtn:disabled{opacity:.5;cursor:default}
+.flagbtn.icon{padding:5px 7px}
+.flagbtn.big{padding:9px 12px;font-size:.9rem}
+.flagchip{display:inline-flex;align-items:center;gap:4px;font:600 .66rem var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--flag);border:1px solid var(--flag);border-radius:4px;padding:0 6px 0 4px;white-space:nowrap}
+.flagchip svg{width:11px;height:11px;fill:currentColor;stroke:currentColor;stroke-width:2;stroke-linejoin:round}
+.qitem.flagged{box-shadow:inset 3px 0 0 var(--flag)}
+.prog{align-items:center}
+.prog-r{display:inline-flex;align-items:center;gap:12px}
+.qz-dot{position:relative}
+.qz-dot.fl::after{content:"";position:absolute;top:-4px;right:-4px;width:10px;height:10px;border-radius:50%;background:var(--flag);border:2px solid var(--surface)}
+.who{margin-top:28px;color:var(--ink-3);font:500 .7rem var(--f-mono);letter-spacing:.04em;text-align:center;overflow-wrap:anywhere}
+.who:empty{display:none}
+.who b{color:var(--ink-2);font-weight:600}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+@media (max-width:520px){
+  .toolbar,.toolbar.hasflag{grid-template-columns:1fr}
+  .editor .two{grid-template-columns:1fr}
+  .fc-nav .btn .kbd,.fc-grade .btn .kbd,.nav-hint{display:none}
+  .tab small{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important}
+}
+</style>
+
+<div class="app">
+  <nav class="tabs" role="tablist" aria-label="Mode">
+    <button class="tab" role="tab" data-act="mode" data-mode="library" id="tab-library">Library <small></small></button>
+    <button class="tab" role="tab" data-act="mode" data-mode="flashcards" id="tab-flashcards">Flashcards</button>
+    <button class="tab" role="tab" data-act="mode" data-mode="quiz" id="tab-quiz">Quiz</button>
+  </nav>
+  <main id="view" aria-live="off"></main>
+  <p class="who" id="who" role="status"></p>
+</div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script type="application/json" id="seed">[{"a":"Internal – DC Gen, AC Gen, Batteries. External – DC GPU, AC GPU","q":"List the internal and external power sources","topic":"Electrical (ATA 24)","wrong":["Internal – DC Gen, AC Gen, APU. External – DC GPU, AC GPU","Internal – DC Gen, Batteries, RAT. External – DC GPU only","Internal – AC Gen, Batteries, TRUs. External – AC GPU, DC GPU, APU"],"id":"q0001"},{"a":"Two","q":"How many generator resets can we perform","topic":"Electrical (ATA 24)","wrong":["One","Three","Unlimited"],"id":"q0002"},{"a":"One","q":"How many gen-bat bus resets can we perform","topic":"Electrical (ATA 24)","wrong":["Two","Three","None"],"id":"q0003"},{"a":"2000A","q":"How many amps does the DC GPU provide","topic":"Electrical (ATA 24)","wrong":["1200A","1500A","2500A"],"id":"q0004"},{"a":"62%","q":"What NH is required for the GEN to come on","topic":"Electrical (ATA 24)","wrong":["50%","70%","80%"],"id":"q0005"},{"a":"Located on the AGB","q":"Where on the engine are the DC Gens located","topic":"Electrical (ATA 24)","wrong":["Located on the RGB","Located on the engine fan case","Located on the propeller gearbox"],"id":"q0006"},{"a":"Located on the RGB","q":"Where on the engine are the AC Gens located","topic":"Electrical (ATA 24)","wrong":["Located on the AGB","Located on the HP compressor casing","Located on the propeller hub"],"id":"q0007"},{"a":"22V","q":"What battery voltage is required for engine start","topic":"Electrical (ATA 24)","wrong":["18V","24V","26V"],"id":"q0008"},{"a":"165","q":"Temp for the GEN HOT caption to come on","topic":"Electrical (ATA 24)","wrong":["145","185","200"],"id":"q0009"},{"a":"50 & 65","q":"Temp for BAT WARM & BAT HOT","topic":"Electrical (ATA 24)","wrong":["40 & 55","60 & 75","50 & 70"],"id":"q0010"},{"a":"26V AC & 115V AC @ 400 Hz","q":"Inverters convert 28V DC to","topic":"Electrical (ATA 24)","wrong":["26V AC & 115V AC @ 60 Hz","28V AC & 115V AC @ 400 Hz","26V AC & 230V AC @ 400 Hz"],"id":"q0011"},{"a":"Only 115V AC","q":"Are both the 26V & 115V AC inverter outputs displayed on the synoptic","topic":"Electrical (ATA 24)","wrong":["Both 26V AC and 115V AC","Only 26V AC","Neither, inverter outputs are not shown on the synoptic"],"id":"q0012"},{"a":"70%","q":"Minimum NP for AC Gen to come online","topic":"Electrical (ATA 24)","wrong":["62%","55%","85%"],"id":"q0013"},{"a":"300A","q":"What is the TRU amp limit","topic":"Electrical (ATA 24)","wrong":["200A","400A","500A"],"id":"q0014"},{"a":"Front right","q":"Where is the DC GPU receptacle located","topic":"Electrical (ATA 24)","wrong":["Front left","Rear right","Rear left"],"id":"q0015"},{"a":"Yes","q":"Do the batteries disconnect when connecting DC GPU","topic":"Electrical (ATA 24)","id":"q0016"},{"a":"No (300A TRU max output)","q":"Can we start an engine from the AC GPU","topic":"Electrical (ATA 24)","id":"q0017"},{"a":"Right side MLG fairing","q":"Where is the AC GPU receptacle located","topic":"Electrical (ATA 24)","wrong":["Left side MLG fairing","Nose gear bay","Rear fuselage, right side"],"id":"q0018"},{"a":"Yes","q":"During an emergency when the TRUs are powering the aircraft, is the misc bus shed","topic":"Electrical (ATA 24)","id":"q0019"},{"a":"OFF","q":"In order to test the back-up (EFIS) batteries, what position should the ENG MODE SEL switch be at","topic":"Electrical (ATA 24)","wrong":["NORM","START","MOTOR"],"id":"q0020"},{"a":"During startup","q":"When is the back-up (EFIS) battery used","topic":"Electrical (ATA 24)","wrong":["During takeoff","In flight, when both generators fail","During landing rollout"],"id":"q0021"},{"a":"Equipment powered by Misc Bus 1 Group 3 and Misc Bus 2 Group 4 is lost","q":"Which of the following describes the system status if the “AC GEN 1 FAIL” caution message is generated & MISC XFR has been subsequently activated","source":"Prog Check","topic":"Electrical (ATA 24)","wrong":["Equipment powered by Misc Bus 1 Group 3 and Misc Bus 2 Group 3 is lost","Equipment powered by Misc Bus 1 Group 4 and Misc Bus 2 Group 3 is lost","All equipment powered by Misc Bus 1 and Misc Bus 2 is lost"],"id":"q0022"},{"a":"The ability to power MISC BUS 1 + 2 from DC Gen 1 on the ground","q":"What operation is enabled using the prop brake & GEN-MISC-TIE pushbuttons","topic":"Electrical (ATA 24)","wrong":["The ability to power MISC BUS 1 + 2 from AC Gen 1 on the ground","The ability to power the DC GEN BUS from the batteries on the ground","The ability to power MISC BUS 1 + 2 from the AC GPU in flight"],"id":"q0023"},{"a":"400A","q":"What is the max continuous load permitted on the DC gen","source":"Prog Check","topic":"Electrical (ATA 24)","wrong":["300A","500A","600A"],"id":"q0024"},{"a":"To check that DC gen is auto disconnected from DC GEN BUS when a ground fault appears","q":"What is the function of the GF switch located on the DC Elec Panel","source":"Prog Check","topic":"Electrical (ATA 24)","wrong":["To manually disconnect the DC gen from the DC GEN BUS in the event of an overheat","To test the DC gen overcurrent protection by simulating a 400A load","To isolate the batteries from the DC GEN BUS when a ground fault appears"],"id":"q0025"},{"a":"Internal, external & emergency","q":"What subsystems constitute the lighting system","topic":"Lights (ATA 33)","wrong":["Internal, external & landing","Cockpit, cabin & emergency","Navigation, anticollision & emergency"],"id":"q0026"},{"a":"To check for in-flight ice accretion on the wing leading edge and engine nacelle","q":"What is the function of the wing inspection lights","topic":"Lights (ATA 33)","wrong":["To illuminate the wing tips for formation flying","To check for fuel leaks from the wing tanks in flight","To illuminate the wing and flaps during a night landing"],"id":"q0027"},{"a":"Yes","q":"Do the taxi lights turn off automatically when the landing gear uplock is engaged","topic":"Lights (ATA 33)","id":"q0028"},{"a":"Four","q":"How many emergency light power supplies are there","topic":"Lights (ATA 33)","wrong":["Two","Three","Six"],"id":"q0029"},{"a":"CAS message appears","q":"What happens when both cabin emer light switches are off","topic":"Lights (ATA 33)","wrong":["The emergency lights come on automatically","The cabin lights go to full brightness","Nothing, the switches are independent"],"id":"q0030"},{"a":"Two, vertical stab, two","q":"There are ____ anticollision lights on the aircraft, located on the lower fuselage and on the _____. They are controlled by _____ switches","source":"Prog Check","topic":"Lights (ATA 33)","wrong":["Two, wing tips, one","Three, vertical stab, three","One, wing tips, two"],"id":"q0031"},{"a":"ARM","q":"What is the normal configuration of the emer lighting for the flight (with no emer situation present)","source":"Prog Check","topic":"Lights (ATA 33)","wrong":["ON","OFF","TEST"],"id":"q0032"},{"a":"Cargo cabin/exterior","q":"An EMER LIGHT OFF CAS message warns the crew of an incorrect flight configuration for which emergency lights","source":"Prog Check","topic":"Lights (ATA 33)","wrong":["Cockpit/flight deck","Cockpit/cargo cabin","Troop seating area only"],"id":"q0033"},{"a":"Portable flashlight","q":"Which type of emergency lighting is found in the cockpit","source":"Prog Check","topic":"Lights (ATA 33)","wrong":["Fixed floodlight on the emergency bus","Photoluminescent floor strips","Battery-powered dome light"],"id":"q0034"},{"a":"CCP","q":"Which joystick is inhibited when the CURSOR INHIBIT is pressed","topic":"Indicating & Recording (ATA 31)","wrong":["MKP","CDU","Both the CCP and the MKP"],"id":"q0035"},{"a":"PFD, CAS, EIS","q":"What three mandatory images are displayed in the event of a triple AFD failure","topic":"Indicating & Recording (ATA 31)","wrong":["PFD, MAP, EIS","PFD, CAS, SYNOPTIC","HSI, CAS, EIS"],"id":"q0036"},{"a":"It allows scrolling of the CAS MSG page","q":"What does the “CAS” P/B on the MKP do","topic":"Indicating & Recording (ATA 31)","wrong":["It acknowledges and clears the active CAS messages","It recalls the CAS history page","It inhibits the aural alert for the CAS message"],"id":"q0037"},{"a":"Magenta – FMS, Green – Current/sensed data, Cyan – pilot selectable parameters","q":"What are the three colours associated with the PFD and what do they represent","topic":"Indicating & Recording (ATA 31)","wrong":["Magenta – pilot selectable parameters, Green – FMS, Cyan – current/sensed data","Magenta – current/sensed data, Green – FMS, Cyan – pilot selectable parameters","Magenta – FMS, Green – pilot selectable parameters, Cyan – current/sensed data"],"id":"q0038"},{"a":"CM 1/2 side panel","q":"Where are the standalone clocks located","topic":"Indicating & Recording (ATA 31)","wrong":["Glareshield","Overhead panel","Centre pedestal"],"id":"q0039"},{"a":"Start/stop","q":"What button initiates the counter","topic":"Indicating & Recording (ATA 31)","wrong":["Reset","Lap/hold","Mode select"],"id":"q0040"},{"a":"Inside PFD config (gear icon)","q":"Where can you select the ADI & HSI config boxes","topic":"Indicating & Recording (ATA 31)","wrong":["On the MKP, using the SET key","In the FMS PERF page","On the DISPLAY panel on the glareshield"],"id":"q0041"},{"a":"HSI and map format","q":"Where is the WXR overlay displayed","topic":"Indicating & Recording (ATA 31)","wrong":["HSI only","Map format only","ADI and HSI"],"id":"q0042"},{"a":"2500ft","q":"At what alt does radalt come alive","topic":"Indicating & Recording (ATA 31)","wrong":["1000ft","1500ft","5000ft"],"id":"q0043"},{"a":"Lower centre of the ADI area","q":"Where is the rad alt displayed","topic":"Indicating & Recording (ATA 31)","wrong":["Next to the altitude tape","At the top of the ADI","On the EIS strip"],"id":"q0044"},{"a":"SYS","q":"What hot key brings up the system synoptic","topic":"Indicating & Recording (ATA 31)","wrong":["SYN","MENU","EIS"],"id":"q0045"},{"a":"WPTS (airports, navaids, intersections) & airways","q":"What is available on the FMS search function","topic":"Indicating & Recording (ATA 31)","wrong":["WPTS only (airports, navaids, intersections)","Airways and SIDs/STARs","Airports and runways only"],"id":"q0046"},{"a":"Cruise synoptic","q":"Where can you find the MAX/MIN g-forces","topic":"Indicating & Recording (ATA 31)","wrong":["Flight controls synoptic","Engine synoptic","Electrical synoptic"],"id":"q0047"},{"a":"No","q":"When cancelling audio with AURAL INHIBIT, do you still receive TCAS alerts","topic":"Indicating & Recording (ATA 31)","id":"q0048"},{"a":"Yes","q":"If the RIU fails, do you still receive TCAS alerts","topic":"Indicating & Recording (ATA 31)","id":"q0049"},{"a":"When reaching the DH","q":"When do RA MINS appear","topic":"Indicating & Recording (ATA 31)","wrong":["When reaching the MDA","When descending through 500ft RA","At the minimum set on the BARO"],"id":"q0050"},{"a":"Whenever a new paper QRH is issued","q":"When should electrical/onboard checklists be renewed","topic":"Indicating & Recording (ATA 31)","wrong":["Every 28 days with the NAV database","Every 6 months","Whenever the aircraft software is updated"],"id":"q0051"},{"a":"28 days","q":"How often is the NAV database updated","topic":"Indicating & Recording (ATA 31)","wrong":["14 days","30 days","56 days"],"id":"q0052"},{"a":"Flap position","q":"Which of the following is not a qualifier for windshear","topic":"Indicating & Recording (ATA 31)","wrong":["Parking brake position","Engine in RUN","PRS in TOGA"],"id":"q0053"},{"a":"CAS strip, checklist MFW, Synop MFW","q":"What do we lose if EICAS fails","topic":"Indicating & Recording (ATA 31)","wrong":["PFD, CAS strip, checklist MFW","Synoptic MFW, PFD, engine instruments","CAS strip and EIS only"],"id":"q0054"},{"a":"Primary DCU","q":"Where does the FDR gather its data from","topic":"Indicating & Recording (ATA 31)","wrong":["Secondary DCU","Mission computer","Flight guidance computer (FGC)"],"id":"q0055"},{"a":"Synoptics & nearly all CAS messages","q":"What do you lose when the primary DCU fails","topic":"Indicating & Recording (ATA 31)","wrong":["PFD and HSI displays","FMS navigation and all radio functions","Synoptics only, all CAS messages remain"],"id":"q0056"},{"a":"Side console","q":"Where are the CDUs located","topic":"Indicating & Recording (ATA 31)","wrong":["Centre pedestal","Glareshield","Overhead panel"],"id":"q0057"},{"a":"V/UHF, IFF M-HF","q":"What functions are controlled by the CDU","topic":"Indicating & Recording (ATA 31)","wrong":["VHF/COM, ADF, DME","V/UHF, TCAS, WXR","SATCOM, ELT, SELCAL"],"id":"q0058"},{"a":"Yes","q":"Does the FDR have a ULB","topic":"Indicating & Recording (ATA 31)","id":"q0059"},{"a":"25hrs","q":"How long does the FDR record for","topic":"Indicating & Recording (ATA 31)","wrong":["10hrs","50hrs","100hrs"],"id":"q0060"},{"a":"It will suppress sensitive parameters","q":"What does the FDR SUPPR button do","topic":"Indicating & Recording (ATA 31)","wrong":["It stops the FDR recording immediately","It erases the previous flight's data","It switches the FDR to the secondary DCU"],"id":"q0061"},{"a":"Two hours","q":"How long does the CVR record for","topic":"Indicating & Recording (ATA 31)","wrong":["30 minutes","One hour","Twenty-five hours"],"id":"q0062"},{"a":"4 channels","q":"How many channels does the CVR have","topic":"Indicating & Recording (ATA 31)","wrong":["2 channels","3 channels","6 channels"],"id":"q0063"},{"a":"Normalised AoA","q":"What type of data is shown on the AoA gauge","topic":"Navigation (ATA 34)","wrong":["True AoA in degrees","Pitch attitude","Flight path angle"],"id":"q0064"},{"a":"When AoA values differ by 0.3 for more than 3 seconds","q":"When do we get the “AoA Miscomp”","topic":"Navigation (ATA 34)","wrong":["When AoA values differ by 0.1 for more than 1 second","When AoA values differ by 0.3 for more than 10 seconds","When AoA values differ by 0.5 for more than 3 seconds"],"id":"q0065"},{"a":"ADC","q":"What calculates TAS","topic":"Navigation (ATA 34)","wrong":["FMS","AHRS","GNSS"],"id":"q0066"},{"a":"FMS","q":"What calculates GS","topic":"Navigation (ATA 34)","wrong":["ADC","AHRS","DME"],"id":"q0067"},{"a":"Vmo","q":"Logistic MAX OVSPEED switch effects what","topic":"Navigation (ATA 34)","wrong":["Vne","Vfe","Vle"],"id":"q0068"},{"a":"Manual Rev","q":"If the IAPS does not manually revert, what options do you have","topic":"Navigation (ATA 34)","wrong":["Cycle the IAPS circuit breakers","Select the standby instruments only","Revert the display to the EIS"],"id":"q0069"},{"a":"When IAPS automatically reverts the data source","q":"When do you see “PFD Data Rev” on CAS","topic":"Navigation (ATA 34)","wrong":["When the pilot manually reverts the data source","When PFD compare detects a miscompare","When the ADC is switched off"],"id":"q0070"},{"a":"On the DATA SOURCE REVER panel by pulling the selector towards them","q":"If the pilot in the C/M 2 seat needs to manually revert PFD 2 to the cross side C/M 1 ADC, how would they do this","topic":"Navigation (ATA 34)","wrong":["On the DATA SOURCE REVER panel by pushing the selector away from them","On the PFD config page by selecting ADC 1","On the MKP by pressing the REV key"],"id":"q0071"},{"a":"Miscompare alerts for critical flight parameters","q":"Which of the following functions is associated with a “PFD compare fail” caution message","topic":"Navigation (ATA 34)","wrong":["Failure of the PFD display unit","Loss of the ADC source","Disagreement between FMS and GNSS positions"],"id":"q0072"},{"a":"FMS + GNSS","q":"Which of the following is required for RNAV GNSS Appr","topic":"Navigation (ATA 34)","wrong":["FMS + DME/DME","GNSS + ILS","FMS + VOR/DME"],"id":"q0073"},{"a":"PFD Config → ADI Config","q":"Where can we select SVS","topic":"Navigation (ATA 34)","wrong":["PFD Config → HSI Config","Setup → Status → FMS","MKP → SVS key"],"id":"q0074"},{"a":"Yes","q":"Is the GNSS posn init process automatic","topic":"Navigation (ATA 34)","id":"q0075"},{"a":"Setup → status → FMS","q":"Where can we see the position of the aircraft","topic":"Navigation (ATA 34)","wrong":["Setup → status → GNSS","PFD Config → HSI Config","SYS → Cruise synoptic"],"id":"q0076"},{"a":"GNSS/SBAS","q":"The GNSS system is composed of….","topic":"Navigation (ATA 34)","wrong":["GNSS/DGPS","GNSS/IRS","GNSS/ADF"],"id":"q0077"},{"a":"ADF, MKRB, VOR, DME","q":"What audio from navaids can we receive","topic":"Navigation (ATA 34)","wrong":["ADF, VOR, DME, ILS","VOR, DME, MKRB, TACAN","ADF, MKRB, ILS, DME"],"id":"q0078"},{"a":"Three","q":"How many DME channels are there","topic":"Navigation (ATA 34)","wrong":["One","Two","Four"],"id":"q0079"},{"a":"DME, XPDR/IFF (TCAS), WXR, RAD ALT, DATALINK, SELCAL (all radiation)","q":"“ECOM MUTE” removes;","topic":"Navigation (ATA 34)","wrong":["WXR, RAD ALT and DME only","VHF/COM 1, VHF/COM 2 and HF","XPDR/IFF, TAWS, ADF and VOR"],"id":"q0080"},{"a":"The onside ADF is failing","q":"What does “NAV ADF 1 FAIL” mean","topic":"Navigation (ATA 34)","wrong":["The offside ADF is failing","Both ADFs are failing","The ADF audio is inhibited on the ACP"],"id":"q0081"},{"a":"PFD","q":"Where do we receive TAWS alerts","topic":"Navigation (ATA 34)","wrong":["EIS","CAS page only","Map display only"],"id":"q0082"},{"a":"Basic functions 1-6 & enhanced mode (forward looking) FLTA, FLOA, PDA","q":"What is the TAWS system composed of","topic":"Navigation (ATA 34)","wrong":["Basic functions 1-6 only","Basic functions 1-4 & enhanced mode FLTA, FLOA, PDA","Basic functions 1-6 & enhanced mode FLTA and windshear only"],"id":"q0083"},{"a":"Yes","q":"Do we lose TAWS INHIB if we lose MKP","topic":"Navigation (ATA 34)","id":"q0084"},{"a":"\u003c1000ft","q":"Below what alt are RAs inhibited (TA only)","topic":"Navigation (ATA 34)","wrong":["\u003c500ft","\u003c1500ft","\u003c2500ft"],"id":"q0085"},{"a":"ADI","q":"In relation to TCAS, where is the fly to cue displayed","topic":"Navigation (ATA 34)","wrong":["HSI","Map format","EIS"],"id":"q0086"},{"a":"TO: >1200FT AGL, LAND: >2300FT AGL","q":"Predictive W/S is inhibited at TO & landing at what altitudes","topic":"Navigation (ATA 34)","wrong":["TO: >1000FT AGL, LAND: >2300FT AGL","TO: >1200FT AGL, LAND: >1500FT AGL","TO: >2300FT AGL, LAND: >1200FT AGL"],"id":"q0087"},{"a":"Parking brake off, either engine in RUN (FFL), PRS in TOGA","q":"What is required for the PWS to be activated","topic":"Navigation (ATA 34)","wrong":["Parking brake on, both engines in RUN, PRS in TOGA","Parking brake off, both engines in RUN, PRS in NORM","Parking brake off, either engine in START, PRS in TOGA"],"id":"q0088"},{"a":"ACP, jack, PTT","q":"What makes up a full audio station","topic":"Communications (ATA 23)","wrong":["ACP, speaker, PTT","ACP, jack, VOX","Jack, speaker, boom mic"],"id":"q0089"},{"a":"No","q":"Can we use VOX for radios","topic":"Communications (ATA 23)","id":"q0090"},{"a":"10","q":"How many PA speakers are in the cabin","topic":"Communications (ATA 23)","wrong":["6","8","12"],"id":"q0091"},{"a":"Loss of VHF/COM 1","q":"Which of the following is NOT a consequence of setting EMER on the ACP","topic":"Communications (ATA 23)","wrong":["Loss of interphone with the other crew stations","Loss of access to the other radios (COM 2, HF, V/UHF)","Loss of ACP volume control (fixed audio level)"],"id":"q0092"},{"a":"Backup/Emergency","q":"On the pilot ACP, with a single/double EMER button press, what mode do we enter","topic":"Communications (ATA 23)","wrong":["Normal","Maintenance","Interphone only"],"id":"q0093"},{"a":"No, EMER interphone only","q":"Does the C/M 3 ACP have a backup mode, what options do they have","topic":"Communications (ATA 23)","wrong":["Yes, backup mode with COM 1 and COM 2","Yes, backup mode with COM 1 only","No, PA only"],"id":"q0094"},{"a":"Four normal, one maintenance, one emer → six","q":"How many nets are there","topic":"Communications (ATA 23)","wrong":["Three normal, one maintenance, one emer → five","Four normal, two maintenance, one emer → seven","Two normal, one maintenance, one emer → four"],"id":"q0095"},{"a":"C/M 1/2 side consoles","q":"Where is the COM control panel located","topic":"Communications (ATA 23)","wrong":["Centre pedestal","Overhead panel","Glareshield"],"id":"q0096"},{"a":"Tunes 121.5 MHz","q":"What does the EMER p/b do on the C/M 1 COM side panel","topic":"Communications (ATA 23)","wrong":["Tunes 243.0 MHz","Tunes 123.45 MHz","Tunes 118.0 MHz"],"id":"q0097"},{"a":"Signals master FGC","q":"What does the green arrow indicate on the FMA","topic":"Autopilot (ATA 22)","wrong":["Signals the AP is engaged","Signals the active lateral mode","Signals the FD is in standby"],"id":"q0098"},{"a":"Yes","q":"Does the pitch trim release the AP","topic":"Autopilot (ATA 22)","id":"q0099"},{"a":"Non-servo mode","q":"What does the white arrow on the FMA mean","topic":"Autopilot (ATA 22)","wrong":["Armed mode","Servo-engaged mode","Mode reversion"],"id":"q0100"},{"a":"Air conditioning, pressurization, wing & tail de-ice, engine air inlet de-ice, rudder boost system, ground oil cooling system","q":"What is powered by the pneumatic system","topic":"Pneumatic & Pressurization (ATA 21)","wrong":["Air conditioning, pressurization, wing & tail de-ice, engine air inlet de-ice, brakes, ground oil cooling system","Air conditioning, pressurization, propeller de-ice, engine air inlet de-ice, rudder boost system","Air conditioning, pressurization, wing & tail de-ice, flaps, ramp actuation"],"id":"q0101"},{"a":"No & No","q":"Can we control the HPSOV and is there an indication","topic":"Pneumatic & Pressurization (ATA 21)","wrong":["Yes & Yes","Yes & No","No & Yes"],"id":"q0102"},{"a":"Open when PL is below FI and closed when PL is above FI","q":"When is the HPSOV open & closed","topic":"Pneumatic & Pressurization (ATA 21)","wrong":["Open when PL is above FI and closed when PL is below FI","Open when PL is below GI and closed when PL is above GI","Always open, closed only by the AIR CONDITIONING panel switch"],"id":"q0103"},{"a":"Air Cond sys","q":"What subsystem is the PRSOV related to?","topic":"Pneumatic & Pressurization (ATA 21)","wrong":["Wing & tail de-ice","Engine air inlet de-ice","Rudder boost system"],"id":"q0104"},{"a":"No, only on ground","q":"Can we operate X-FEED in the air","topic":"Pneumatic & Pressurization (ATA 21)","wrong":["Yes, at any time","Yes, but only above 10,000ft","No, only with an engine shut down"],"id":"q0105"},{"a":"Weight-on-wheels and gust lock active (vertical posn)","q":"What are the conditions to operate the X-FEED on the ground","topic":"Pneumatic & Pressurization (ATA 21)","wrong":["Weight-on-wheels and parking brake set","Weight-on-wheels and both engines at GI","Gust lock active (vertical posn) and ramp closed"],"id":"q0106"},{"a":"18-30","q":"What is the temperature mode of the air cond when in AUTO mode","topic":"Pneumatic & Pressurization (ATA 21)","wrong":["15-30","18-35","20-28"],"id":"q0107"},{"a":"3; ambient temp sens, knobs, pack temp at outlet","q":"How many inputs are there for AUTO mode","topic":"Pneumatic & Pressurization (ATA 21)","wrong":["2; ambient temp sens, knobs","3; ambient temp sens, knobs, cabin pressure","4; ambient temp sens, knobs, pack temp at outlet, bleed temp"],"id":"q0108"},{"a":"Air Conditioning Synoptic","q":"Where can we see the cockpit/cabin temp","topic":"Pneumatic & Pressurization (ATA 21)","wrong":["Cruise synoptic","EIS","Pressurization page"],"id":"q0109"},{"a":"Primary heat exchanger → Compressor → Secondary Heat Exchanger","q":"What is the flow inside the air cycle machine in the pack","topic":"Pneumatic & Pressurization (ATA 21)","wrong":["Compressor → Primary heat exchanger → Secondary Heat Exchanger","Primary heat exchanger → Secondary Heat Exchanger → Compressor","Secondary Heat Exchanger → Compressor → Primary heat exchanger"],"id":"q0110"},{"a":"Misc busses","q":"What busses power the APB fan","topic":"Pneumatic & Pressurization (ATA 21)","wrong":["DC GEN BUS","Essential busses","Battery busses"],"id":"q0111"},{"a":"Suction, Blower","q":"What is the UNDF 1/2 fan also called","topic":"Pneumatic & Pressurization (ATA 21)","wrong":["Extract, Recirculation","Supply, Blower","Suction, Recirculation"],"id":"q0112"},{"a":"NPAB","q":"What does the UNDF 1 + 2 cool","topic":"Pneumatic & Pressurization (ATA 21)","wrong":["The cargo cabin","The avionics rack","The batteries"],"id":"q0113"},{"a":"10,000ft","q":"At what cabin alt do we get CAS “Cabin Altitude”","topic":"Pneumatic & Pressurization (ATA 21)","wrong":["8,000ft","12,000ft","14,000ft"],"id":"q0114"},{"a":"5.58, 5.67, 5.77 psi","q":"What are the max pressure differentials in AUTO, MAN and the structural lim","topic":"Pneumatic & Pressurization (ATA 21)","wrong":["5.67, 5.58, 5.77 psi","5.58, 5.77, 5.67 psi","5.48, 5.58, 5.67 psi"],"id":"q0115"},{"a":"Main, secondary outflow valve is the back-up","q":"In auto mode, is the primary outflow valve the main or backup","topic":"Pneumatic & Pressurization (ATA 21)","wrong":["Backup, secondary outflow valve is the main","Main, secondary outflow valve is not used in AUTO","Both operate together as equal main valves"],"id":"q0116"},{"a":"O/T in the air delivered by the AC packs to the cockpit or cabin outlets","q":"What does the “Air Cond O/Temp” caution CAS message mean","source":"Prog Check","topic":"Pneumatic & Pressurization (ATA 21)","wrong":["O/T of the bleed air upstream of the PRSOV","O/T in the air cycle machine turbine inlet","O/T in the avionics bay"],"id":"q0117"},{"a":"The Pressure Regulating Shut off Valve","q":"What does the L Engine switches on the AIR CONDITIONING panel control","source":"Prog Check","topic":"Pneumatic & Pressurization (ATA 21)","wrong":["The High Pressure Shut off Valve","The Crossfeed valve","The pack flow control valve"],"id":"q0118"},{"a":"Failure of Automatic Pressurization Controller","q":"What does the CABIN AUTO FAULT caution CAS mean","source":"Prog Check","topic":"Pneumatic & Pressurization (ATA 21)","wrong":["Failure of the primary outflow valve actuator","Cabin differential pressure limit exceeded","Failure of both outflow valves"],"id":"q0119"},{"a":"It extracts hot air from the cabin underfloor and discharges it through the ramp area","q":"What is the function of the UNDF 1 fan","source":"Prog Check","topic":"Pneumatic & Pressurization (ATA 21)","wrong":["It supplies cold air to the cabin underfloor from the air cond packs","It extracts air from the avionics rack and discharges it overboard","It blows cooling air over the batteries"],"id":"q0120"},{"a":"It remains open in low power conditions","q":"The High Pressure Shut OFF Valve controls high pressure bleed air. Which is true","source":"Prog Check","topic":"Pneumatic & Pressurization (ATA 21)","wrong":["It remains closed in low power conditions","It closes when the PL is below FI","It can be controlled from the AIR CONDITIONING panel"],"id":"q0121"},{"a":"Flaps, Gear, Brakes (norm, emer and prop), Ramp, NWS","q":"What systems are powered by the hydraulics","topic":"Hydraulics (ATA 29)","wrong":["Flaps, Gear, Brakes (norm and emer only), Ramp, NWS","Flaps, Gear, Brakes (norm, emer and prop), Ramp, Rudder boost","Flaps, Gear, Brakes (norm, emer and prop), NWS, Propeller pitch"],"id":"q0122"},{"a":"At least 2 engines running (NH > 60%), IAS \u003c 190kts, altitude is 8000ft or airfield alt + 2000ft, whichever is higher","q":"In auto mode, what three conditions are required for pump connection","topic":"Hydraulics (ATA 29)","wrong":["At least 1 engine running (NH > 60%), IAS \u003c 190kts, altitude is 8000ft or airfield alt + 2000ft, whichever is higher","At least 2 engines running (NH > 60%), IAS \u003c 250kts, altitude is 8000ft or airfield alt + 2000ft, whichever is higher","At least 2 engines running (NH > 60%), IAS \u003c 190kts, altitude is 10000ft or airfield alt + 2000ft, whichever is lower"],"id":"q0123"},{"a":"2,1,3","q":"In what sequence are the pumps connected","topic":"Hydraulics (ATA 29)","wrong":["1,2,3","3,2,1","1,3,2"],"id":"q0124"},{"a":"15 min, prevent o/heat","q":"In manual mode, how often should we swap the pumps","topic":"Hydraulics (ATA 29)","wrong":["5 min, prevent o/heat","30 min, prevent o/heat","60 min, prevent o/heat"],"id":"q0125"},{"a":"Nose Landing gear Doors","q":"Which of the following systems does not require Hyd power to operate","source":"Prog Check","topic":"Hydraulics (ATA 29)","wrong":["Flaps","Nose wheel steering","Cargo ramp"],"id":"q0126"},{"a":"To check the status of the cartridge","q":"What is the function of the test p/b","topic":"Fire Protection (ATA 26)","wrong":["To test the fire detection loops","To discharge a bottle into the engine","To test the fire handle solenoid"],"id":"q0127"},{"a":"5; CAS, FIRE HANDLE, FFL, MASTER WARN, AURAL WARNING","q":"How many alerts are there when a fire occurs and what are they","topic":"Fire Protection (ATA 26)","wrong":["4; CAS, FIRE HANDLE, MASTER WARN, AURAL WARNING","5; CAS, FIRE HANDLE, FFL, MASTER WARN, FIRE SYNOPTIC","3; CAS, FIRE HANDLE, AURAL WARNING"],"id":"q0128"},{"a":"Fuel is shut off, start/gen is disconnected, prop brake is inop, propeller feathers & bottles are ready to discharge","q":"What happens when you pull fire handle","topic":"Fire Protection (ATA 26)","wrong":["Fuel is shut off, start/gen is disconnected, prop brake is applied, propeller feathers & bottles discharge automatically","Fuel is shut off, start/gen stays connected, prop brake is inop, propeller feathers & bottles are ready to discharge","Fuel stays on, start/gen is disconnected, prop brake is inop, propeller does not feather & bottles are ready to discharge"],"id":"q0129"},{"a":"Yes","q":"When we discharge a bottle, will the closest one discharge first?","topic":"Fire Protection (ATA 26)","id":"q0130"},{"a":"10; 3 flow through, 7 ambient","q":"How many smoke detectors","topic":"Fire Protection (ATA 26)","wrong":["10; 7 flow through, 3 ambient","8; 2 flow through, 6 ambient","12; 4 flow through, 8 ambient"],"id":"q0131"},{"a":"Press the SMK DET TEST on the SYSTEMS TEST/RESET panel located overhead","q":"How do we perform the smoke det test","topic":"Fire Protection (ATA 26)","wrong":["Press the TEST p/b on the FIRE panel","Select SMK DET TEST on the MKP","Press the SMK DET TEST on the centre pedestal"],"id":"q0132"},{"a":"On the Air Cond/Smk synoptic, on the CAS strip, on the master warning pushbuttons","q":"If a smoke detector detects a given quantity of smoke where will the flight crew see the related alerts","source":"Prog Check","topic":"Fire Protection (ATA 26)","wrong":["On the CAS strip only","On the Air Cond/Smk synoptic and the fire handles","On the CAS strip, the FFL and the master warning pushbuttons"],"id":"q0133"},{"a":"It discharges the contents of the left side bottle into the right engine","q":"What happens when the R ENGINE lever is set to the Disch 2 Position","source":"Prog Check","topic":"Fire Protection (ATA 26)","wrong":["It discharges the contents of the right side bottle into the right engine","It discharges the contents of the right side bottle into the left engine","It discharges the contents of both bottles into the right engine"],"id":"q0134"},{"a":"Master Warning Lights, Fire Light on the FFL and Fire Handle, R ENGINE FIRE warning CAS message and associated Aural Alert","q":"Which alerts are triggered when the R TEST switch located on the FIRE panel is set to the WARN position","source":"Prog Check","topic":"Fire Protection (ATA 26)","wrong":["Master Warning Lights and R ENGINE FIRE warning CAS message only","Master Warning Lights, Fire Light on the FFL and Fire Handle, L ENGINE FIRE warning CAS message and associated Aural Alert","Fire Light on the FFL and Fire Handle and associated Aural Alert only"],"id":"q0135"},{"a":"It discharges the contents of the left side bottle into the left engine","q":"What happens when the L Engine lever is set to the DISCH 1 Position","source":"Prog Check","topic":"Fire Protection (ATA 26)","wrong":["It discharges the contents of the right side bottle into the left engine","It discharges the contents of the left side bottle into the right engine","It discharges the contents of both bottles into the left engine"],"id":"q0136"},{"a":"Aileron, rudder, elevator","q":"What are the primary control surfaces","topic":"Flight Controls (ATA 27)","wrong":["Aileron, rudder, elevator, flaps","Aileron, rudder, trim tabs","Aileron, elevator, spoilers"],"id":"q0137"},{"a":"On the centre pedestal","q":"Where are the standby trims located","topic":"Flight Controls (ATA 27)","wrong":["On the glareshield","On the overhead panel","On the C/M 1 side console"],"id":"q0138"},{"a":"No, only on the panel","q":"Is there a CAS message/indication of a flight control untie","topic":"Flight Controls (ATA 27)","wrong":["Yes, a CAS message","Yes, on the EIS","Yes, on the flight controls synoptic"],"id":"q0139"},{"a":"EIS","q":"Where is the trim tab deflection displayed","topic":"Flight Controls (ATA 27)","wrong":["Cruise synoptic","Flight controls synoptic","PFD"],"id":"q0140"},{"a":"Manual, autopilot, ARTCU","q":"What is the ARTCU trimming priority","topic":"Flight Controls (ATA 27)","wrong":["Autopilot, manual, ARTCU","ARTCU, autopilot, manual","Manual, ARTCU, autopilot"],"id":"q0141"},{"a":"Aircraft on ground, IAS >215 kts, SWRS 1 &/OR 2 fail","q":"When does the SWRS pusher auto-disconnect","topic":"Flight Controls (ATA 27)","wrong":["Aircraft on ground, IAS >190 kts, SWRS 1 &/OR 2 fail","Aircraft in flight, IAS >215 kts, SWRS 1 only fails","Aircraft on ground, IAS >250 kts, both SWRS fail"],"id":"q0142"},{"a":"AoA shift","q":"When entering/exiting icing conditions, what button do we press","topic":"Flight Controls (ATA 27)","wrong":["ICE DETECT","AoA TEST","STALL BIAS"],"id":"q0143"},{"a":"Toward operative engine","q":"What direction does the rudder move during boost operations","topic":"Flight Controls (ATA 27)","wrong":["Toward the failed engine","It stays neutral","It alternates left and right"],"id":"q0144"},{"a":"LOW","q":"We are on approach and lose AUTO mode, what detent do we move the AIRSPEED SEL knob","topic":"Flight Controls (ATA 27)","wrong":["HIGH","MID","NORM"],"id":"q0145"},{"a":"Yes & Yes with reset button","q":"Is the Flap Fail an electrical problem and is it possible to reset","topic":"Flight Controls (ATA 27)","wrong":["No & No","Yes & No","No & Yes with reset button"],"id":"q0146"},{"a":"AoG, hydraulics pwr, flaps in T/O or APP","q":"What are the requirements for a flap BIT","topic":"Flight Controls (ATA 27)","wrong":["AoG, hydraulics pwr, flaps UP","In flight, hydraulics pwr, flaps in T/O or APP","AoG, electrical pwr only, flaps in T/O or APP"],"id":"q0147"},{"a":"SL – 19000FT: T/O 190, APPR 185, LDG 180. @25000FT: 160","q":"Flaps limitation speeds","topic":"Flight Controls (ATA 27)","wrong":["SL – 19000FT: T/O 185, APPR 190, LDG 180. @25000FT: 160","SL – 19000FT: T/O 200, APPR 185, LDG 170. @25000FT: 150","SL – 19000FT: T/O 190, APPR 180, LDG 175. @25000FT: 170"],"id":"q0148"},{"a":"Elevator and rudder trim","q":"One function of the autotrim rudder travel control unit is to modify the rate of movement of the","source":"Prog Check","topic":"Flight Controls (ATA 27)","wrong":["Rudder trim only","Aileron and rudder trim","Elevator trim only"],"id":"q0149"},{"a":"ARTCU elevator trim","q":"Which elevator trim function is failed when a ELV trim Fail caution CAS message is generated?","source":"Prog Check","topic":"Flight Controls (ATA 27)","wrong":["Manual elevator trim","Standby elevator trim","Autopilot elevator trim"],"id":"q0150"},{"a":"There is a mismatch of the flap position in left and right wings","q":"What is the meaning of a FLAPS ASYMMETRY CAS message","source":"Prog Check","topic":"Flight Controls (ATA 27)","wrong":["The flaps failed to move after selection","The flap position does not match the flap lever position","Hydraulic pressure to the flaps is low"],"id":"q0151"},{"a":"EEC 1, release pressure from Rudder Booster actuator, right","q":"When the LH ENGINE FAILS ……. commands the three way valve to …… causing the actuator to move the rudder to the ……","source":"Prog Check","topic":"Flight Controls (ATA 27)","wrong":["EEC 2, release pressure from Rudder Booster actuator, left","EEC 1, apply pressure to Rudder Booster actuator, left","EEC 2, apply pressure to Rudder Booster actuator, right"],"id":"q0152"},{"a":"Behind right MLG fairing","q":"Where is the refuel/defuel panel located","topic":"Fuel (ATA 28)","wrong":["Behind left MLG fairing","In the nose gear bay","On the rear fuselage, right side"],"id":"q0153"},{"a":"7500L","q":"What is the total capacity of the tanks","topic":"Fuel (ATA 28)","wrong":["6500L","8500L","9500L"],"id":"q0154"},{"a":"Two: Fire handle, FFL","q":"How many ways are there to control the FSOV and what are they","topic":"Fuel (ATA 28)","wrong":["One: Fire handle only","One: FFL only","Three: Fire handle, FFL, FUEL panel XFEED switch"],"id":"q0155"},{"a":"Up to 18000kg > 270kg, above 18000kg > 90kg","q":"What is the max fuel imbalance","topic":"Fuel (ATA 28)","wrong":["Up to 18000kg > 90kg, above 18000kg > 270kg","Up to 18000kg > 180kg, above 18000kg > 90kg","Up to 18000kg > 270kg, above 18000kg > 180kg"],"id":"q0156"},{"a":"13,000ft","q":"What is the max fuel suction feeding altitude for JET A-1","topic":"Fuel (ATA 28)","wrong":["10,000ft","15,000ft","20,000ft"],"id":"q0157"},{"a":"Frame 10 + 13","q":"Where is the toilet and galley located","topic":"Fuel (ATA 28)","wrong":["Frame 5 + 8","Frame 13 + 16","Frame 10 + 16"],"id":"q0158"},{"a":"Cruise and fuel synop","q":"Where can we find the quantity of fuel","topic":"Fuel (ATA 28)","wrong":["Engine and cruise synop","Fuel synop only","EIS and engine synop"],"id":"q0159"},{"a":"4 in aux, 2 in main, 1 in collector (with temp compensator)","q":"How many fuel capacity sensors are there","topic":"Fuel (ATA 28)","wrong":["2 in aux, 4 in main, 1 in collector (with temp compensator)","4 in aux, 2 in main, 2 in collector (with temp compensator)","3 in aux, 2 in main, 1 in collector (no temp compensator)"],"id":"q0160"},{"a":"To check fuel indicating system","q":"What is the function of the test button on the fuel panel","topic":"Fuel (ATA 28)","wrong":["To test the booster pumps","To test the FSOV","To test the low fuel level warning only"],"id":"q0161"},{"a":"On FMS","q":"How to reset fuel quantity","topic":"Fuel (ATA 28)","wrong":["On the fuel panel","On the MKP","On the refuel/defuel panel"],"id":"q0162"},{"a":"50C","q":"Fuel Hot caption comes on at","topic":"Fuel (ATA 28)","wrong":["40C","60C","70C"],"id":"q0163"},{"a":"Driven by motive flow causing high pressure fuel bled from the engine fuel pump","q":"The XFR jet pump is","source":"Prog Check","topic":"Fuel (ATA 28)","wrong":["Electrically driven","Driven by bleed air from the pneumatic system","Driven by the engine accessory gearbox"],"id":"q0164"},{"a":"Electrically driven","q":"A Booster Pump is","source":"Prog Check","topic":"Fuel (ATA 28)","wrong":["Driven by motive flow from the engine fuel pump","Driven by bleed air","Driven by the engine accessory gearbox"],"id":"q0165"},{"a":"Enables fuel to flow from the Auxiliary to the Main tank","q":"The Gravity transfer valve…","source":"Prog Check","topic":"Fuel (ATA 28)","wrong":["Enables fuel to flow from the Main to the Collector tank","Enables fuel to flow from the left Main to the right Main tank","Connects both Engine Feed Lines"],"id":"q0166"},{"a":"Enables fuel flow from the Main to Collector tank","q":"The Flapper Valve…..","source":"Prog Check","topic":"Fuel (ATA 28)","wrong":["Enables fuel flow from the Auxiliary to the Main tank","Enables fuel flow from the Collector tank to the engine","Connects both Engine Feed Lines"],"id":"q0167"},{"a":"Connects both Engine Feed Lines upstream of the Fuel Shut OFF Valve","q":"The Crossfeed Valve…..","source":"Prog Check","topic":"Fuel (ATA 28)","wrong":["Connects both Engine Feed Lines downstream of the Fuel Shut OFF Valve","Connects both Main tanks","Enables fuel flow from the Auxiliary to the Main tank"],"id":"q0168"},{"a":"When we energise the L&R pitot","q":"How do we heat the TAT sensor","topic":"Ice & Rain Protection (ATA 30)","wrong":["When we energise the ENG AIR INLET d-ice","With bleed air from the pneumatic system","When we energise the AOA probes only"],"id":"q0169"},{"a":"When they receive power when the ENG AIR INLET d-ice system is connected, the drain mast is also energised","q":"When do the distribution valves energise (heating elements)","topic":"Ice & Rain Protection (ATA 30)","wrong":["When the W&T d-ice system is connected, the drain mast is not energised","When the boots are inflated, the drain mast is also energised","When ICE DETECT is on, the drain mast is not energised"],"id":"q0170"},{"a":"Press and hold for 6 seconds each","q":"When in manual mode, how do we operate the boots","topic":"Ice & Rain Protection (ATA 30)","wrong":["Press once, the boots cycle for 6 seconds","Press and hold for 10 seconds each","Press and hold for 3 seconds each"],"id":"q0171"},{"a":"No, the SOV pb must be pressed to disconnect the W&T system which allows the eng air inlet to continue to work","q":"If we lose W&T d-ice, do we lose eng air inlet d-ice","topic":"Ice & Rain Protection (ATA 30)","wrong":["Yes, both systems are lost together","No, it continues automatically without any action","Yes, unless the crossfeed is selected"],"id":"q0172"},{"a":"“Pneum D-ice Fail”","q":"What combination of CAS message do we get when “L+R Eng D-Ice + W+T D-ice Fail”","topic":"Ice & Rain Protection (ATA 30)","wrong":["“D-ICE FAIL”","“ICE SYS FAIL”","“Pneum Ice Fail”"],"id":"q0173"},{"a":"C/M 1+2 side panel","q":"Where is the wiper control panel located","topic":"Ice & Rain Protection (ATA 30)","wrong":["Overhead panel","Glareshield","Centre pedestal"],"id":"q0174"},{"a":"Both L and R","q":"If the C/M 1 or 2 operates the window wipers, do they operate both L and R or just onside wipers","topic":"Ice & Rain Protection (ATA 30)","wrong":["Only onside wipers","Only offside wipers","It depends on the selector position"],"id":"q0175"},{"a":"NP above 70%","q":"The Prop Heating Jackets require which of the following conditions to operate","source":"Prog Check","topic":"Ice & Rain Protection (ATA 30)","wrong":["NP above 62%","NH above 62%","NP above 85%"],"id":"q0176"},{"a":"The AC Generators","q":"Which components power prop deicing system","source":"Prog Check","topic":"Ice & Rain Protection (ATA 30)","wrong":["The DC Generators","The TRUs","The batteries"],"id":"q0177"},{"a":"Ice Detector, Pitot Heat, AOA","q":"Which Ice and Rain Protection Systems shall be turned on before flight in any weather condition","source":"Prog Check","topic":"Ice & Rain Protection (ATA 30)","wrong":["Ice Detector, Wing & Tail de-ice, AOA","Pitot Heat, Engine air inlet de-ice, Prop heating","Ice Detector, Window wipers, Pitot Heat"],"id":"q0178"},{"a":"Ice formation on airframe","q":"What does the ICE Formation caution CAS message mean","source":"Prog Check","topic":"Ice & Rain Protection (ATA 30)","wrong":["Ice formation on the propeller","Ice formation in the engine air inlet","Failure of the ice detector"],"id":"q0179"},{"a":"Opening: Cargo door, Locks, Ramp door. Closing: Ramp door, Locks, Cargo door","q":"Describe the correct sequence for opening the cargo ramp","topic":"Doors & Windows (ATA 52)","wrong":["Opening: Ramp door, Locks, Cargo door. Closing: Cargo door, Locks, Ramp door","Opening: Locks, Cargo door, Ramp door. Closing: Ramp door, Cargo door, Locks","Opening: Cargo door, Ramp door, Locks. Closing: Locks, Ramp door, Cargo door"],"id":"q0180"},{"a":"By means of a door","q":"How is it possible to separate the cargo cabin from the cockpit","topic":"Doors & Windows (ATA 52)","wrong":["By means of a curtain","By means of a cargo net","It is not possible to separate them"],"id":"q0181"},{"a":"4 (2 NLG, 1 each MLG)","q":"How many LG doors are there","topic":"Doors & Windows (ATA 52)","wrong":["2 (1 NLG, 1 MLG)","3 (1 NLG, 1 each MLG)","6 (2 NLG, 2 each MLG)"],"id":"q0182"},{"a":"Ramp Cylinders","q":"What does the legend CYL refer to","source":"Prog Check","topic":"Doors & Windows (ATA 52)","wrong":["Cargo door cylinders","Landing gear cylinders","Flap cylinders"],"id":"q0183"},{"a":"HYD PUMPS ON, HYD PRESS ON, OPR SELECT CKPT","q":"What is the sequence for the ramp and cargo door opening operation from the cockpit","source":"Prog Check","topic":"Doors & Windows (ATA 52)","wrong":["OPR SELECT CKPT, HYD PUMPS ON, HYD PRESS ON","HYD PRESS ON, HYD PUMPS ON, OPR SELECT CKPT","HYD PUMPS ON, OPR SELECT CKPT, HYD PRESS ON"],"id":"q0184"},{"a":"From the Hyd Utility Panel on the overhead panel","q":"How is it possible to control the operation of the ramp and cargo door from the cockpit","topic":"Doors & Windows (ATA 52)","wrong":["From the Doors panel on the centre pedestal","From the Hyd Utility Panel on the C/M 2 side console","From the cargo door panel on the glareshield"],"id":"q0185"},{"a":"High pressure gaseous type","q":"What type of portable O2 do we have","topic":"Oxygen (ATA 35)","wrong":["Chemical generator type","Liquid oxygen type","Low pressure gaseous type"],"id":"q0186"},{"a":"C/M 2 lateral/side console","q":"Where is the O2 gauge & SOV","source":"Prog Check","topic":"Oxygen (ATA 35)","wrong":["C/M 1 lateral/side console","Overhead panel","Centre pedestal"],"id":"q0187"},{"a":"1850psi","q":"What pressure is the bottle charged to","source":"Prog Check","topic":"Oxygen (ATA 35)","wrong":["1400psi","2000psi","2250psi"],"id":"q0188"},{"a":"1400, 1000psi","q":"What pressure is required for three C/M and two C/M respectively","topic":"Oxygen (ATA 35)","wrong":["1000, 1400psi","1850, 1400psi","1200, 800psi"],"id":"q0189"},{"a":"There is no oxygen flow to the mask","q":"What is the meaning of a red flow indicator on the Crew Oxygen mask?","source":"Prog Check","topic":"Oxygen (ATA 35)","wrong":["Oxygen is flowing normally to the mask","The oxygen bottle is empty","The mask is in emergency mode"],"id":"q0190"},{"a":"Retract gear on the ground","q":"What does the override button do","topic":"Landing Gear (ATA 32)","wrong":["Extend gear in flight","Release the brakes","Disable the WoW sensors"],"id":"q0191"},{"a":"Wheels/Hyd synop","q":"Where is it possible to see gear status","topic":"Landing Gear (ATA 32)","wrong":["Cruise synop","Engine synop","EIS only"],"id":"q0192"},{"a":"220, 450","q":"At what temperature do we get the brakes warm/hot caption","topic":"Landing Gear (ATA 32)","wrong":["200, 400","250, 500","220, 400"],"id":"q0193"},{"a":"||| = brake inop, box = residual braking","q":"What do the three yellow lines and yellow box mean on the synop","topic":"Landing Gear (ATA 32)","wrong":["||| = residual braking, box = brake inop","||| = brake hot, box = brake inop","||| = anti-skid inop, box = residual braking"],"id":"q0194"},{"a":"30±3 kt","q":"What speed is the anti-skid operative","topic":"Landing Gear (ATA 32)","wrong":["20±3 kt","40±3 kt","50±3 kt"],"id":"q0195"},{"a":"Anti-skid, touchdown, locked wheel","q":"What are the three protections offered by anti-skid","topic":"Landing Gear (ATA 32)","wrong":["Anti-skid, parking brake, locked wheel","Anti-skid, touchdown, auto-brake","Anti-skid, rejected takeoff, locked wheel"],"id":"q0196"},{"a":"Degraded: one or more systems are limited. Fail: all a-skid protections are inop","q":"What is the difference between “A-Skid Degraded” & “A-Skid Fail”","topic":"Landing Gear (ATA 32)","wrong":["Degraded: all a-skid protections are inop. Fail: one or more systems are limited","Degraded: one wheel is affected. Fail: both main gear are affected","Degraded: touchdown protection only is lost. Fail: locked wheel protection only is lost"],"id":"q0197"},{"a":"Hyd Pumps connected, NLG DN + locked, WoW, steering PB active on STR panel","q":"What are the conditions for NWS","topic":"Landing Gear (ATA 32)","wrong":["Hyd Pumps connected, NLG DN + locked, WoW, parking brake off","Hyd Pumps connected, NLG DN + locked, WoW, both engines running","Hyd Pumps connected, NLG DN, in flight, steering PB active on STR panel"],"id":"q0198"},{"a":"It allows the landing gear to be lowered when all Hyd pressure is lost","q":"What is the purpose of the emergency landing gear extension system","source":"Prog Check","topic":"Landing Gear (ATA 32)","wrong":["It allows the landing gear to be lowered when electrical power is lost","It allows the landing gear to be retracted after an emergency extension","It overrides the WoW sensors to allow gear retraction on the ground"],"id":"q0199"},{"a":"Mechanically","q":"How are the doors of the nose landing gear operated","source":"Prog Check","topic":"Landing Gear (ATA 32)","wrong":["Hydraulically","Electrically","Pneumatically"],"id":"q0200"},{"a":"Between frame 10-13","q":"Where is the winch located","topic":"Equipment & Furnishing (ATA 25)","wrong":["Between frame 5-8","Between frame 13-16","Between frame 15-18"],"id":"q0201"},{"a":"Behind C/M 2","q":"Where is the crash axe","topic":"Equipment & Furnishing (ATA 25)","wrong":["Behind C/M 1","On the cockpit overhead panel","On the forward cargo cabin bulkhead"],"id":"q0202"},{"a":"12g, 6g, 2.6g","q":"What g forces activate the ELT","topic":"Equipment & Furnishing (ATA 25)","wrong":["12g, 6g, 4.5g","10g, 5g, 2.6g","9g, 6g, 2.6g"],"id":"q0203"},{"a":"Three: 121.5 MHz, 243 MHz, 406 MHz","q":"How many frequencies does the ELT transmit on","topic":"Equipment & Furnishing (ATA 25)","wrong":["Two: 121.5 MHz, 406 MHz","Two: 243 MHz, 406 MHz","Three: 121.5 MHz, 243 MHz, 450 MHz"],"id":"q0204"},{"a":"In the glareshield","q":"Where is the ELT control panel","topic":"Equipment & Furnishing (ATA 25)","wrong":["On the overhead panel","On the centre pedestal","On the C/M 2 side console"],"id":"q0205"},{"a":"CAS message appears","q":"What indications are there when the ELT is transmitting","topic":"Equipment & Furnishing (ATA 25)","wrong":["Aural tone in the cockpit only","Red light on the ELT panel only","Master warning light only"],"id":"q0206"},{"a":"The Misc Bus","q":"Which electrical bus is required to power the Lavatory?","source":"Prog Check","topic":"Equipment & Furnishing (ATA 25)","wrong":["The Essential Bus","The DC GEN Bus","The Battery Bus"],"id":"q0207"},{"a":"Under the forward fuselage door","q":"Where is the Winch Panel located","source":"Prog Check","topic":"Equipment & Furnishing (ATA 25)","wrong":["Behind C/M 2","Next to the cargo ramp","On the cockpit overhead panel"],"id":"q0208"},{"a":"Positioning the CM1 and CM2 seats","q":"What is the sight reference purpose located on the windshield structure","source":"Prog Check","topic":"Equipment & Furnishing (ATA 25)","wrong":["Aligning the aircraft on the runway centreline","Judging the approach angle","Estimating wing clearance during taxi"],"id":"q0209"},{"a":"2","q":"How many sliding windows are in the cockpit","source":"Prog Check","topic":"Equipment & Furnishing (ATA 25)","wrong":["1","3","4"],"id":"q0210"},{"a":"PW127G, Hamilton Sundstrand 568F-S","q":"What model engine and prop do we have","topic":"Powerplant & Prop (ATA 61-80)","wrong":["PW127M, Hamilton Sundstrand 568F-S","PW127G, Hamilton Sundstrand 568F-1","PW150A, Dowty R408"],"id":"q0211"},{"a":"As a percentage of max RPM","q":"What format for Np in terms of indications","topic":"Powerplant & Prop (ATA 61-80)","wrong":["As absolute RPM","As a percentage of max torque","As blade angle in degrees"],"id":"q0212"},{"a":"Five: Max rev, GI, FI, MAX AUTO, MAX MAN","q":"How many PL positions are there","topic":"Powerplant & Prop (ATA 61-80)","wrong":["Four: Max rev, GI, FI, MAX","Six: Max rev, GI, FI, MAX AUTO, MAX MAN, TOGA","Three: GI, FI, MAX"],"id":"q0213"},{"a":"Off, START, RUN","q":"How many FFL settings are there","topic":"Powerplant & Prop (ATA 61-80)","wrong":["Off, RUN","Off, START, RUN, FEATHER","Off, START, IDLE, RUN"],"id":"q0214"},{"a":"Retard PL to FI","q":"Before resetting EEC, what do we have to do","topic":"Powerplant & Prop (ATA 61-80)","wrong":["Retard PL to GI","Set the FFL to OFF","Set the PL to Max rev"],"id":"q0215"},{"a":"Before the engine fuel pump","q":"Where are the sensors that measure fuel temp + px","topic":"Powerplant & Prop (ATA 61-80)","wrong":["After the engine fuel pump","At the fuel shut off valve","In the collector tank"],"id":"q0216"},{"a":"Eng, Fuel & cruise synop","q":"Where can we see fuel flow","topic":"Powerplant & Prop (ATA 61-80)","wrong":["Eng & fuel synop only","Cruise synop & EIS","Fuel synop only"],"id":"q0217"},{"a":"Handling bleed valve (compressor surge protection), auto ignition, Automatic Power Reserve (APR), minimum prop speed, rudder boost (degraded during EEC fail)","q":"What does the EEC control","topic":"Powerplant & Prop (ATA 61-80)","wrong":["Handling bleed valve, auto ignition, APR, propeller feathering, rudder boost","Handling bleed valve, auto ignition, APR, minimum prop speed, fuel shut off valve","Auto ignition, APR, minimum prop speed, rudder boost, engine oil temperature"],"id":"q0218"},{"a":"30%","q":"During startup, at what NH does EEC take control","topic":"Powerplant & Prop (ATA 61-80)","wrong":["20%","40%","50%"],"id":"q0219"},{"a":"Auto-ignition kicks in","q":"If during engine start NH \u003c 64.5%, what happens","topic":"Powerplant & Prop (ATA 61-80)","wrong":["The start is aborted automatically","A FAIL ON START caution appears and the starter disengages","The propeller feathers"],"id":"q0220"},{"a":"10/15% (ITT \u003c250, ITT >250); 40-45% (positive oil px); 50% (No fail on start p/b); 66±2% (eng stabilised before 30s)","q":"Engine start procedure","topic":"Powerplant & Prop (ATA 61-80)","wrong":["10/15% (ITT \u003c250, ITT >250); 40-45% (positive oil px); 60% (No fail on start p/b); 66±2% (eng stabilised before 30s)","10/15% (ITT \u003c250, ITT >250); 30-35% (positive oil px); 50% (No fail on start p/b); 66±2% (eng stabilised before 60s)","10/15% (ITT \u003c200, ITT >200); 40-45% (positive oil px); 50% (No fail on start p/b); 60±2% (eng stabilised before 30s)"],"id":"q0221"},{"a":"40 sec","q":"What is the time limit on IGN","topic":"Powerplant & Prop (ATA 61-80)","wrong":["20 sec","30 sec","60 sec"],"id":"q0222"},{"a":"715 (prop brake), 765 (T/O), 840 (normal), 950 (start)","q":"What are the ITT limits","topic":"Powerplant & Prop (ATA 61-80)","wrong":["715 (prop brake), 765 (normal), 840 (T/O), 950 (start)","765 (prop brake), 715 (T/O), 840 (normal), 950 (start)","715 (prop brake), 765 (T/O), 840 (start), 950 (normal)"],"id":"q0223"},{"a":"NL; Engine & Cruise Synoptic, PRS; EIS & Engine synoptic","q":"Where is it possible to see the NL/PRS selection","topic":"Powerplant & Prop (ATA 61-80)","wrong":["Fuel & cruise syn / EIS only","Engine syn only","PFD & Engine syn"],"id":"q0224"},{"a":"TQ1 → AFU → DCU 3110 → AFD; TQ2 → EEC → AFD","q":"Describe the TQ 1 & 2 channels","topic":"Powerplant & Prop (ATA 61-80)","wrong":["TQ1 → EEC → AFD; TQ2 → AFU → DCU 3110 → AFD","TQ1 → AFU → AFD; TQ2 → EEC → DCU 3110 → AFD","TQ1 → EEC → DCU 3110 → AFD; TQ2 → AFU → AFD"],"id":"q0225"},{"a":"30s on 1 off, 30s on 1 off, 30s on 15min off","q":"What are the starter limits","topic":"Powerplant & Prop (ATA 61-80)","wrong":["30s on 1 off, 30s on 1 off, 30s on 5min off","60s on 1 off, 60s on 1 off, 60s on 15min off","30s on 30s off, 30s on 30s off, 30s on 15min off"],"id":"q0226"},{"a":"Primary + secondary","q":"How many exhaust assemblies are there","topic":"Powerplant & Prop (ATA 61-80)","wrong":["Primary only","Primary + secondary + tertiary","Two primary assemblies"],"id":"q0227"},{"a":"Engine compartment, HBV, pneumatic precooler","q":"Which sources of air does the exhaust expel","topic":"Powerplant & Prop (ATA 61-80)","wrong":["Engine compartment, HBV, oil cooler","Engine compartment, pneumatic precooler, cabin outflow valve","HBV, pneumatic precooler, air cond pack"],"id":"q0228"},{"a":"0 deg, 45 deg in icing cond","q":"Min oil temp for T/O","topic":"Powerplant & Prop (ATA 61-80)","wrong":["-10 deg, 45 deg in icing cond","0 deg, 30 deg in icing cond","10 deg, 55 deg in icing cond"],"id":"q0229"},{"a":"55-65 psi","q":"Normal oil pressure range","topic":"Powerplant & Prop (ATA 61-80)","wrong":["35-45 psi","45-55 psi","65-75 psi"],"id":"q0230"},{"a":"30 sec","q":"What is the time limit for the MAN feather button","topic":"Powerplant & Prop (ATA 61-80)","wrong":["10 sec","20 sec","60 sec"],"id":"q0231"},{"a":"C/M 2 side console","q":"Where is the PWP MAINT panel located","topic":"Powerplant & Prop (ATA 61-80)","wrong":["C/M 1 side console","Overhead panel","Centre pedestal"],"id":"q0232"},{"a":"Performed automatically when FFLs moved from start to run","q":"When is it possible to perform SLPS test","topic":"Powerplant & Prop (ATA 61-80)","wrong":["Performed manually on the ground using the PWP MAINT panel","Performed automatically at engine shutdown","Performed automatically when the PL is moved from FI to GI"],"id":"q0233"},{"a":"1 or more AFUs do not send armed signal","q":"What is the meaning of autofeather fail","topic":"Powerplant & Prop (ATA 61-80)","wrong":["Both AFUs have failed","The propeller failed to feather after an engine failure","The autofeather test has not been performed"],"id":"q0234"},{"a":"Shut down the eng","q":"If you get ‘Prop Brake Fail’ msg, what do we need to do","topic":"Powerplant & Prop (ATA 61-80)","wrong":["Reset the EEC","Feather the prop and continue","Pull the fire handle"],"id":"q0235"},{"a":"In the lower engine cowling","q":"Where is the air cooled oil cooler outlet located","source":"Prog Check","topic":"Powerplant & Prop (ATA 61-80)","wrong":["In the upper engine nacelle","Behind the propeller spinner","On the side of the exhaust duct"],"id":"q0236"},{"a":"140","q":"The crew shall shut down an engine when its oil temp reaches which value Red CAS","source":"Prog Check","topic":"Powerplant & Prop (ATA 61-80)","wrong":["125","155","170"],"id":"q0237"},{"a":"EEC","q":"Which component detects an engine flameout condition","source":"Prog Check","topic":"Powerplant & Prop (ATA 61-80)","wrong":["AFU","DCU","Ignition exciter"],"id":"q0238"},{"a":"Miscompare between NH sources","q":"What is a possible meaning of an amber box around the NH on the EIS format","source":"Prog Check","topic":"Powerplant & Prop (ATA 61-80)","wrong":["NH is above the normal operating range","NH sensor has failed","The EEC is in manual mode"],"id":"q0239"},{"a":"Both autofeather units are armed","q":"What does ARM light on FEATHER/APR panel indicate","topic":"Powerplant & Prop (ATA 61-80)","wrong":["Either autofeather unit is armed","APR is armed on both engines","The autofeather test is in progress"],"id":"q0240"},{"a":"950 for 5 sec","q":"What is the max permitted ITT for engine start","source":"Prog Check","topic":"Powerplant & Prop (ATA 61-80)","wrong":["950 for 10 sec","840 for 5 sec","765 for 5 sec"],"id":"q0241"},{"a":"To produce constant frequency AC power","q":"What is the purpose of the main inverter","source":"Real Exam Q","topic":"Electrical (ATA 24)","wrong":["To produce 28 V DC power","To produce wild frequency AC power","To convert 28 V DC power to a lower voltage"],"id":"q0242"},{"a":"Ice detector, temp probe heaters","q":"The AC inverters (MAIN & STBY) supply 115/26 VAC to which systems","source":"Real Exam Q","topic":"Electrical (ATA 24)","wrong":["Propde-ice, pneumatic deice system","Misc busses in order to power the sockets in the cargo cabin","TRU in case of dual gen failures"],"id":"q0243"},{"a":"Prop deice system, pneumatic deice system, TRUs","q":"Which of the following are user systems of AC Wild Frequency power","source":"Real Exam Q","topic":"Electrical (ATA 24)","wrong":["Engine air inlet deice system, prop deice system","Ice detector, temperature probes","AC General service sockets"],"id":"q0244"},{"a":"The misc busses will be de-energised","q":"Which of the following is a consequence of using the TRUs to power the DC busses","source":"Real Exam Q","topic":"Electrical (ATA 24)","wrong":["A BUS UNTIE warning CAS message will be shown","The AC inverters will become inoperative","The AC/DC?... generators will be automatically disconnected"],"id":"q0245"},{"a":"300A","q":"What is the maximum continuous load that a TRU can supply","source":"Real Exam Q","topic":"Electrical (ATA 24)","wrong":["200A","400A","500A"],"id":"q0246"},{"a":"121.5, 243, 406 MHz (satellite)","q":"The ELT system transmits SOS signals. These signals are both analog and digital and are emitted on which of the following frequencies","source":"Real Exam Q","topic":"Equipment & Furnishing (ATA 25)","wrong":["121.5 MHz, 243 MHz (satellite)","Data Link K band","121.5 MHz, 406 MHz"],"id":"q0247"},{"a":"On the glareshield","q":"Where is the ELT remote control panel located","source":"Real Exam Q","topic":"Equipment & Furnishing (ATA 25)","wrong":["On the overhead panel","On the CM2 lateral console","On the pedestal"],"id":"q0248"},{"a":"Master WARNING lights, FIRE light on the FFL and Fire handle, L Eng Fire Cas and associated aural tone","q":"On the FIRE panel, when the L TEST switch is set to the WARN position, which alerts do we receive","source":"Real Exam Q","topic":"Fire Protection (ATA 26)","wrong":["Mater Caution lights, L Fire Det Fail caution CAS message","Master WARNING lights, FIRE light on the FFL and Fire handle, L Eng Fire Cas and associated aural tone, READY light on","Master WARNING lights, FIRE light on the FFL and Fire handle, L Fire Det Fail caution"],"id":"q0249"},{"a":"The correct connection of the cartridges to the Engine Fire Extinguishers","q":"On the FIRE panel, when the BOTTLE TEST pushbutton is pushed, what does this mean","source":"Real Exam Q","topic":"Fire Protection (ATA 26)","wrong":["The correct connection of the Engine Fire Sensing Elements","The correction functioning of the Engine Fire Detection Control Unit","The correct pressure of the Engine Fire Extinguisher Bottles"],"id":"q0250"},{"a":"The occupants in the cargo cabin","q":"The passenger address systems allowed crew members to communicate with","source":"Real Exam Q","topic":"Communications (ATA 23)","wrong":["Other aircraft","Ground stations","Ground personnel"],"id":"q0251"},{"a":"Tunes VHF 1 radio to the VHF guard frequency (121.5 MHz)","q":"What is the effect of pushing the COM 1 EMER p/b on the COM CONTROL panels","source":"Real Exam Q","topic":"Communications (ATA 23)","wrong":["Tunes HF Radio to the HF guard freq (2182kHz)","Sets the C/M 1 ACP to EMER mode","Sets the audio output a the C/M 1 ACP to the mask microphone"],"id":"q0252"},{"a":"TUNE/DLINK KEY","q":"Which pushbutton on the MKP is used as a shortcut to tune the COM radio frequency?","source":"Real Exam Q","topic":"Communications (ATA 23)","wrong":["SYS key","QIK TUNE KEY","MEM KEY"],"id":"q0253"},{"a":"1 audio control panel, At least 1 PTT selector, 1 jackbox","q":"Which set of components are present at each crewmember station","source":"Real Exam Q","topic":"Communications (ATA 23)","wrong":["1 audio management unit, At least 1 PTT selector, 1 jackbox","1 audio management unit, 1 ACU, 1 PTT","1 audio control panel, At least 1 PTT selector, 2 jackbox"],"id":"q0254"},{"a":"To enable internal communication without using the PTT","q":"What is the function of the VOX ADJ pushbutton on the ACP","source":"Real Exam Q","topic":"Communications (ATA 23)","wrong":["To enable communication with ground personnel","To enable external communications without using the PTT","To enable communication over the cargo cabin speakers"],"id":"q0255"},{"a":"Loss of COM1 radio tuning","q":"Which of the following is not a consequence of setting EMG mode on the C/M1 audio control panel","source":"Real Exam Q","topic":"Communications (ATA 23)","wrong":["Loss of aural alerts through the C/M1 speakers","Loss of radio transmission over the COM 2 raido","Loss of VOX ADJ function"],"id":"q0256"},{"a":"CM1 ACP FAIL","q":"Which of thd following situations would you require the use of backup mode on the C/M 1 ACP","source":"Real Exam Q","topic":"Communications (ATA 23)","wrong":["L AMU FAIL","R AMU FAIL","Aural Alerts Fail"],"id":"q0257"},{"a":"C/M 1 ACP, C/M 2 ACP","q":"On which of the following pairs of ACP is backup mode available","source":"Real Exam Q","topic":"Communications (ATA 23)","wrong":["Loadmaster ACP, left observer ACP","C/M 1 ACP/ C/M 3 ACP","C/M 1 ACP, LM ACP"],"id":"q0258"},{"a":"On the CAS strip (No Door Unlocked message), On the pressn/doors synoptic","q":"Where can the status of the aircraft doors be checked before initiating pressurization?","source":"Real Exam Q","topic":"Doors & Windows (ATA 52)","wrong":["On the EIS format","On the CAS strip (No Door Unlocked message), on the HYDRAULIC UTILITY panel","On the PWP MAINT panel"],"id":"q0259"},{"a":"Select the location from which the ventral door is operated","q":"What is the function of the OPR SEL selector on the HYDRAULIC UTILITY panel","source":"Real Exam Q","topic":"Doors & Windows (ATA 52)","wrong":["Turn on the hydraulic power for the ventral door","Set the ramp cylinders to the locked position","Select the operating sequence of the ventral door"],"id":"q0260"},{"a":"Prevents the propeller pitch angle from decreasing below FI pitch in flight","q":"What is the purpose of the Secondary Low Pitch Protection system","source":"Real Exam Q","topic":"Powerplant & Prop (ATA 61-80)","wrong":["Provides the propeller pitch angle to the Electronic Propeller Controller","Allowed the PL to be set below FI position in flight","Synchronises the propellers"],"id":"q0261"},{"a":"Move the FFL to START when NH reaches 15%","q":"Given that the ITT for the engine to be started shows 260, what is the correct action relating to the FFLs","source":"Real Exam Q","topic":"Powerplant & Prop (ATA 61-80)","wrong":["Move the FFL to RUN when NH reaches 20%","Move the FFL to START when NH reaches 10%","Move the FFL to RUN when NH reaches 10%"],"id":"q0262"},{"a":"2500ft","q":"In descent, at which height above ground does the rad alt readout become ‘alive’ on the PFD","source":"Real Exam Q","topic":"Navigation (ATA 34)","wrong":["1000ft","3000ft","5000ft"],"id":"q0263"},{"a":"VOR, LOC, DME, ADF","q":"Which receivers are controlled (directly or indirectly) through the NAV control area on the Tune MFW","source":"Real Exam Q","topic":"Navigation (ATA 34)","wrong":["VOR, DME","VOR, DME, LOC , GS, MB","VOR, LOC, DME"],"id":"q0264"},{"a":"Display of flight guidance cues","q":"Which of the following is not a function of the FMS","source":"Real Exam Q","topic":"Navigation (ATA 34)","wrong":["Current position determination","Flight plan creation and management","Computation of performance parameters along the flight plan route"],"id":"q0265"},{"a":"On the MAP MFW","q":"Where can the active flight plan be displayed in graphical format","source":"Real Exam Q","topic":"Navigation (ATA 34)","wrong":["On the Chart MFW","On the FMS MFW","On the SVS"],"id":"q0266"},{"a":"Dead Reckoning","q":"What does the FMS use as a last resort to determine the current position","source":"Real Exam Q","topic":"Navigation (ATA 34)","wrong":["Cross-side GNSS","ADF","VOR/DME"],"id":"q0267"},{"a":"Standard, Terrain, Obstacles","q":"Which types of databases are managed and used by the FMS","source":"Real Exam Q","topic":"Navigation (ATA 34)","wrong":["Standard, Pilot, Performance","Standard, Pilot Tactical","Standard, Pilot, Mission"],"id":"q0268"},{"a":"28 days","q":"What is the validity cycle of the navigation database (standard)","source":"Real Exam Q","topic":"Navigation (ATA 34)","wrong":["15 days","3 months","6 months"],"id":"q0269"},{"a":"FGP","q":"What is used to engage AP and YD and activate FD cues","source":"Real Exam Q","topic":"Autopilot (ATA 22)","wrong":["Touchscreen hotspots on PFD","MKP","CCP"],"id":"q0270"},{"a":"Manual Pitch Trim Switch","q":"Which of the following controls will manually disengage the AP","source":"Real Exam Q","topic":"Autopilot (ATA 22)","wrong":["Manual Roll Trim Switch","Rudder Trim Switch","Standby Roll Trim Guard"],"id":"q0271"},{"a":"Reduce the bank angle limit from 27 to 15","q":"In the FGS, what is the purpose of half bank mode","source":"Real Exam Q","topic":"Autopilot (ATA 22)","wrong":["Gradually reduce the bank angle limit as altitude increases","Increase the bank angle limit from 15 to 27","Reduce the bank angle limit during low level flight"],"id":"q0272"},{"a":"The aircraft bank angle on activation is 5 degrees or more","q":"On activation of ROLL mode, the current bank angle is maintained if","source":"Real Exam Q","topic":"Autopilot (ATA 22)","wrong":["The aircraft bank angle on activation is 4 degrees or more","Half Bank mode is set","The aircraft pitch attitude on activation is 5 degrees or more"],"id":"q0273"},{"a":"Target altitude, target airspeed","q":"Flight Level Change mode requires two target parameters. What are they?","source":"Real Exam Q","topic":"Autopilot (ATA 22)","wrong":["Target altitude, target vertical speed","Target altitude, target pitch angle","Target altitude, target heading"],"id":"q0274"},{"a":"The LP bleed air comes from the first compression stage, while the HP bleed air comes from the second compression stage","q":"The air distribution system is composed of two identical subsystems that extract LP bleed air and HP bleed air from each engine. Which of the following statements is correct","source":"Real Exam Q","topic":"Pneumatic & Pressurization (ATA 21)","wrong":["The LP bleed air comes from the second compression stage, while the HP bleed air comes from the first compression stage","The LP bleed air comes from the first compression stage, while the HP bleed air comes from the power turbine stage","The LP bleed air comes from the second compression stage, while the HP bleed air comes from the power turbine stage"],"id":"q0275"},{"a":"Air leakage around the air conditioning packs or in the engine nacelles","q":"What does the Wing Overheat warning CAS message mean","source":"Real Exam Q","topic":"Pneumatic & Pressurization (ATA 21)","wrong":["Overpressure in the bleed air duct, overtemperature in the air cycle machine outlet","Overtemperature in the bleed air duct","Overtemperature in the air delivered by the air conditioning packs to the cockpit or cabin outlets"],"id":"q0276"},{"a":"Closes, because the HP bleed air is more than 65 psi","q":"When the power levers are positioned at flight idle or above, the high pressure shut off valve","source":"Real Exam Q","topic":"Pneumatic & Pressurization (ATA 21)","wrong":["Opens, because the HP bleed air is less than 65 psi","Always remains open","Remained open or closed depending on the position of the L/R ENGINE switches"],"id":"q0277"},{"a":"5.77psi","q":"What is the maximum differential cabin pressure limited by the structure of the aircraft","source":"Real Exam Q","topic":"Pneumatic & Pressurization (ATA 21)","wrong":["4.98psi","5.58psi","6.58 psi"],"id":"q0278"},{"a":"The batteries are automatically disconnected from their busbars","q":"When the AC GPU is electrically connected to the aircraft (AC EXT pushbutton pushed in)","source":"Real Exam Q","topic":"Electrical (ATA 24)","wrong":["The batteries will be charged through the AC GPU","There is a supply of 115V AC to the bus bars","The batteries continue supplying their busbars"],"id":"q0279"},{"a":"PRS set to TOGA, Both PLs are close to MAX AUTO, Torque of both engines is above 48%","q":"The autofeather system will be armed when which of the following sets of conditions is met","source":"Real Exam Q","topic":"Powerplant & Prop (ATA 61-80)","wrong":["PRS set to MCT, Both PLs are close to MAX AUTO, Torque of both engines is above 68%","PRS set to MCT, Both PLs are close to MAX AUTO, Torque of both engines is above 48%","PRS set to TOGA, Both PLs are close to MAX AUTO, Torque of both engines is above 80%"],"id":"q0280"},{"a":"Mechanical Fuel Control Unit","q":"Which component determines the right quantity of fuel to the engine","source":"Real Exam Q","topic":"Powerplant & Prop (ATA 61-80)","wrong":["Fuel Flowmeter","Power Rating Selector","Flow Divider"],"id":"q0281"},{"a":"Flight Idle","q":"To transfer the electronic engine control mode from automatic to manual, which position does the power lever need to be in","source":"Real Exam Q","topic":"Powerplant & Prop (ATA 61-80)","wrong":["Ground Idle","Max Auto","Max Man"],"id":"q0282"},{"a":"BUS UNTIE","exact":true,"q":"Which of the following CAS message is it normal to see during a cross-start","source":"Real Exam Q","topic":"Powerplant & Prop (ATA 61-80)","wrong":["TRU CURRENT","DC GEN HOT"],"id":"q0283"},{"a":"40 psi","q":"The crew shall proceed to shut down an engine when its oil pressure descends to which value (corresponding to red crew warning indications","source":"Real Exam Q","topic":"Powerplant & Prop (ATA 61-80)","wrong":["50 psi","55psi","60 psi"],"id":"q0284"},{"a":"5 min","q":"What is the maximum permitted time to operate the engine at max power (PRS in TOGA and PL at MAX AUTO)","source":"Real Exam Q","topic":"Powerplant & Prop (ATA 61-80)","wrong":["Unrestricted","15 min","20 min"],"id":"q0285"},{"a":"DC GEN, TRU, Batteries","q":"In the event of a electrical system failure in which order are the generating systems used to keep the aircraft powered","source":"Prog Check","topic":"Electrical (ATA 24)","wrong":["TRU, DC GEN, Batteries","DC GEN, Batteries, TRU","Batteries, DC GEN, TRU"],"id":"q0286"},{"a":"CCP","q":"Which of the following functions is associated with a CM 1 curser INhib message","source":"Prog Check","topic":"Indicating & Recording (ATA 31)","wrong":["MKP","FGP","CDU"],"id":"q0287"},{"a":"PFD CAS EIS","q":"If there is a LO AFD FAIL caution message which formats will be shown on the LI AFD","source":"Prog Check","topic":"Indicating & Recording (ATA 31)","wrong":["PFD MAP EIS","PFD CAS SYNOPTIC","HSI CAS EIS"],"id":"q0288"},{"a":"Tune MFW","q":"Which of the following functions is associated with left tuning inop caution message","source":"Prog Check","topic":"Indicating & Recording (ATA 31)","wrong":["FMS MFW","Map MFW","Checklist MFW"],"id":"q0289"},{"a":"EIS","q":"Which of the following functions is associated with a EICAS FAIL caution message","source":"Prog Check","topic":"Indicating & Recording (ATA 31)","wrong":["PFD","Tune MFW","Map MFW"],"id":"q0290"},{"a":"On the PFD Format VSpeeds/Min","q":"How are BARO minimums set","source":"Prog Check","topic":"Navigation (ATA 34)","wrong":["On the Tune MFW","On the glareshield DISPLAY panel","On the FMS PERF page"],"id":"q0291"},{"a":"On the PFD FORMAT (Radar Mode)","q":"How are the weather RADAR MODES SELLECTED","source":"Prog Check","topic":"Navigation (ATA 34)","wrong":["On the Tune MFW","On a WXR control panel on the centre pedestal","On the Map MFW"],"id":"q0292"},{"a":"Yellow","q":"What color represents a Traffic Advisory on the traffic overlay","source":"Prog Check","topic":"Navigation (ATA 34)","wrong":["Red","Cyan","White"],"id":"q0293"},{"a":"On the NAV SOURCE REVER panel by pulling the selector towards them (PFD 2 REV POS)","q":"If pilot in the C/M-2 seat needs to manually revert PFD 2 to the cross side C/M-1 air data source how would they do this","source":"Prog Check","topic":"Navigation (ATA 34)","wrong":["On the NAV SOURCE REVER panel by pushing the selector away from them (PFD 2 REV POS)","On the PFD config page by selecting ADC 1","On the MKP by pressing the REV key"],"id":"q0294"},{"a":"Back-up mode","q":"If a CM1 ACP FAIL advisory CAS message is generated in which mode shall the effected ACP be in","source":"Prog Check","topic":"Communications (ATA 23)","wrong":["Emergency mode","Normal mode","Maintenance mode"],"id":"q0295"},{"a":"Emergency mode","q":"If a L AMU Fail advisory CAS message is generated which mode shall affected ACPs be in","source":"Prog Check","topic":"Communications (ATA 23)","wrong":["Back-up mode","Normal mode","Maintenance mode"],"id":"q0296"},{"a":"Set own ACP to EMG mode and use PTT to transmit","q":"How is it possible to communicate with another audio station in emergency mode","source":"Prog Check","topic":"Communications (ATA 23)","wrong":["Select an interphone net on the ACP and use VOX","Use the PA system from the loadmaster station","It is not possible in emergency mode"],"id":"q0297"},{"a":"Any int net from 1 to 4","q":"Which of the following Interphone networks has to be set for communications between crew members in the cockpit","source":"Prog Check","topic":"Communications (ATA 23)","wrong":["Only INT NET 1","Only INT NET 3","The MAINT net"],"id":"q0298"},{"a":"In lateral mode field of the flight mode annunciator","q":"When HDG mode is activated where does the green HDG annunciation appear","source":"Prog Check","topic":"Autopilot (ATA 22)","wrong":["In the vertical mode field of the flight mode annunciator","On the HSI heading bug only","On the CAS strip"],"id":"q0299"},{"a":"Recover from an overspeed condition","q":"Overspeed mode provides Flight Director cues to","source":"Prog Check","topic":"Autopilot (ATA 22)","wrong":["Maintain the current airspeed","Capture the selected altitude","Level off at the current altitude"],"id":"q0300"},{"a":"VMX +5","q":"What is the target used by Overspeed mode","source":"Prog Check","topic":"Autopilot (ATA 22)","wrong":["VMX -5","VMX","VMX +10"],"id":"q0301"},{"a":"Both flight directors are operative","q":"Which of the following conditions is required to engage the Autopilot","source":"Prog Check","topic":"Autopilot (ATA 22)","wrong":["At least one flight director is operative","The yaw damper is disengaged","Both PLs are at MAX AUTO"],"id":"q0302"},{"a":"Fail light on the pushbutton, ‘fail’ on AC synop and “Main Inv Fail” & “Inv Bus Volt Lo” CAS msg","q":"What do you see initially when the main inverter fails","topic":"Electrical (ATA 24)","wrong":["Fail light on the pushbutton, ‘fail’ on AC synop and “Main Inv Fail” CAS msg only","Fail light on the pushbutton and “Inv Bus Volt Lo” CAS msg only, nothing on the AC synop","‘Fail’ on AC synop and “Main Inv Fail” & “Stby Inv Fail” CAS msg, no light on the pushbutton"],"id":"q0303"},{"a":"On the AIR CONDITIONING panel","q":"Where are the switches located to operate the Pressure Regulating Shut Off Valves (PRSOV)?","source":"Sample Exam Q","topic":"Pneumatic & Pressurization (ATA 21)","wrong":["On the ICE PROTECTION panel","On the Pressurization Control panel","On the ENGINE START panel"],"id":"q0304"},{"a":"Overpressure in the bleed air duct | Overtemperature in the air cycle machine outlet","q":"What does the Bleed O/Temp caution CAS message mean?","source":"Sample Exam Q","topic":"Pneumatic & Pressurization (ATA 21)","wrong":["Air leakage around the air conditioning packs or in the engine nacelles","Overtemperature in the bleed air duct","Overtemperature in the air delivered by the air conditioning packs to the cockpit or cabin outlets"],"id":"q0305"},{"a":"It blows cool air into the Non-Pressurized Avionics Bay","q":"What is the function of the UNDF2 fan?","source":"Sample Exam Q","topic":"Pneumatic & Pressurization (ATA 21)","wrong":["It extracts hot air from the cabin underfloor and discharges it through the ramp area","It extracts hot air from the Pressurized Avionics Bays and sends it back to the Air Conditioning Packs","It provides cool air to the cockpit and cargo cabin"],"id":"q0306"},{"a":"The cabin altitude is above 10000 ft","q":"What does the Cabin Altitude warning CAS message mean?","source":"Sample Exam Q","topic":"Pneumatic & Pressurization (ATA 21)","wrong":["The cabin altitude is above 8000 ft","The differential cabin pressure is above 5.67 psi","The differential cabin pressure is above 5.58 psi"],"id":"q0307"},{"a":"On the Glareshield","q":"Where is the Flight Guidance Panel (FGP) located?","source":"Sample Exam Q","topic":"Autopilot (ATA 22)","wrong":["On the Pedestal","On the C/M-1 Lateral Console","On the Overhead Panel"],"id":"q0308"},{"a":"CPL pushbutton on Flight Guidance Panel (FGP) is pushed","q":"Which of the following will not cause the Autopilot to disengage?","source":"Sample Exam Q","topic":"Autopilot (ATA 22)","wrong":["Stall condition detected","YD/AP DISC switch bar set to down position (red-white indication visible)","AP DISC pushbutton on either control wheel is pushed"],"id":"q0309"},{"a":"VOR/LOC | GNSS","q":"Which are the possible navigation sources that can be used with NAV (navigation) mode?","source":"Sample Exam Q","topic":"Autopilot (ATA 22)","wrong":["VOR/LOC | FMS","FMS | ADF","FMS | GNSS"],"id":"q0310"},{"a":"By pushing the currently-active mode pushbutton on the Flight Guidance Panel (FGP)","q":"How is it possible to revert to Pitch Mode when a higher vertical mode has been activated?","source":"Sample Exam Q","topic":"Autopilot (ATA 22)","wrong":["By pushing the PITCH pushbutton on the Flight Guidance Panel (FGP)","By pushing the SYNC pushbutton on the control wheel","By turning the UP/DN wheel on the Flight Guidance Panel (FGP)"],"id":"q0311"},{"a":"Maintain a Vertical Speed (VS) reference","q":"The Vertical Speed (VS) mode of the Flight Guidance System (FGS) generates guidance cues to...","source":"Sample Exam Q","topic":"Autopilot (ATA 22)","wrong":["Maintain an Indicated Air Speed (IAS) reference","Maintain an Altitude reference","Maintain a Ground Speed (GS) reference"],"id":"q0312"},{"a":"HF Radio | ADF Receiver","q":"The build-up of static charge on the airframe can cause interference with which onboard systems?","source":"Sample Exam Q","topic":"Communications (ATA 23)","wrong":["ADF Receiver | VOR/LOC Receiver","HF Radio | VHF Radio","VHF Radio | VOR/LOC Receiver"],"id":"q0313"},{"a":"From the Map Multifunction Window (MFW)","q":"From where is it not possible to change the frequency of the COM radios?","source":"Sample Exam Q","topic":"Communications (ATA 23)","wrong":["From the Cursor Control Panel (CCP)","From the Audio Control Panel (ACP)","From the Tune Multifunction Window (MFW)"],"id":"q0314"},{"a":"PA","q":"Which key on the Audio Control Panel (ACP) has to be pressed to activate transmission over the cargo cabin loudspeakers?","source":"Sample Exam Q","topic":"Communications (ATA 23)","wrong":["S/T VOL","VOX ADJ","MASK"],"id":"q0315"},{"a":"[1] Push receiver pushbutton once [2] While LED flashes, use VOL knob to set volume","q":"How is it possible to adjust the volume of an already-selected receiver on the Audio Control Panel (ACP)?","source":"Sample Exam Q","topic":"Communications (ATA 23)","wrong":["[1] Open the receiver control on the Tune MFW [2] Set the volume using the softkey","[1] Push receiver pushbutton twice in quick succession [2] While LED flashes, use VOL knob to set volume","[1] Use VOL knob to set volume [2] Push receiver pushbutton"],"id":"q0316"},{"a":"On the bottom row","q":"Where are the transmitter pushbuttons located on the Audio Control Panel (ACP)?","source":"Sample Exam Q","topic":"Communications (ATA 23)","wrong":["On the second from bottom row","On the top row","On the second from top row"],"id":"q0317"},{"a":"Broadcast a message immediately to all audio stations, regardless of pushbutton selections on each Audio Control Panel (ACP)","q":"What is the purpose of the CALL pushbutton on the Audio Control Panel (ACP)?","source":"Sample Exam Q","topic":"Communications (ATA 23)","wrong":["Communicate with the two ground stations on the exterior fuselage","Transmit a voice message over the cargo cabin speakers for passenger attention","Generate a chime over the cargo cabin loudspeakers to attract cabin crew attention"],"id":"q0318"},{"a":"To select among Normal, Backup and Emergency modes","q":"What is the function of the EMG pushbutton on the Audio Control Panel (ACP)?","source":"Sample Exam Q","topic":"Communications (ATA 23)","wrong":["To enable the Mask microphone","To select between Mask and Boom microphones","To adjust the volume in Emergency mode"],"id":"q0319"},{"a":"CM1 ACP Fail","q":"Which of the following CAS messages requires the use of Backup (B/U) mode on the Audio Control Panel (ACP)?","source":"Sample Exam Q","topic":"Communications (ATA 23)","wrong":["AMU Fail","AMU Fail","Aural Alerts Fail"],"id":"q0320"},{"a":"Four (C/M-1 ACP | C/M-2 ACP | C/M-3 ACP | Cockpit Ambient Microphone)","q":"The Solid-State Cockpit Voice Recorder (SSCVR) records audio channels from how many sources in the cockpit?","source":"Sample Exam Q","topic":"Communications (ATA 23)","wrong":["One (C/M-1 ACP)","Two (C/M-1 ACP | C/M-2 ACP)","Three (C/M-1 ACP | C/M-2 ACP | C/M-3 ACP)"],"id":"q0321"},{"a":"2 x Inverters (one is main, the other is standby)","q":"The AC Constant Frequency System is composed of...","source":"Sample Exam Q","topic":"Electrical (ATA 24)","wrong":["2 x AC Generators | 2 x TRUs (Transformer Rectifier Units)","2 x Inverters (powering the left and right sides of the aircraft respectively)","2 x AC Generators | 2 x Inverters"],"id":"q0322"},{"a":"NP","q":"Which engine parameter is directly related to the operation of the AC Generators?","source":"Sample Exam Q","topic":"Electrical (ATA 24)","wrong":["NH","NL","TQ"],"id":"q0323"},{"a":"22 V","q":"What is the minimum aircraft battery voltage required to start the engine?","source":"Sample Exam Q","topic":"Electrical (ATA 24)","wrong":["26 V","24 V","20 V"],"id":"q0324"},{"a":"The battery temperature sensor is defective or data is invalid","q":"On the DC ELECTRIC synoptic, what does it mean when the battery temperature indication shows XXX°C?","source":"Sample Exam Q","topic":"Electrical (ATA 24)","wrong":["The battery temperature is at -10°C and must be heated","The battery temperature is above 90°C and must be cooled","The battery temperature is between 0°C and 49°C"],"id":"q0325"},{"a":"TRU selector","q":"Which control on the DC ELECTRIC panel is used after a dual generator failure to provide power to the aircraft main DC buses?","source":"Sample Exam Q","topic":"Electrical (ATA 24)","wrong":["GEN BUS TIE pushbutton","MISC XFER pushbutton","RESET pushbutton"],"id":"q0326"},{"a":"The load on TRU 1 is more than or equal to 300 A","q":"What does the TRU 1 Current caution CAS message mean?","source":"Sample Exam Q","topic":"Electrical (ATA 24)","wrong":["The load on TRU 1 is more than or equal to 500 A","The load on TRU 1 is less than or equal to 300 A","The load on TRU 1 is less than or equal to 400 A"],"id":"q0327"},{"a":"Behind the C/M-2 seat","q":"Where is the Axe located?","source":"Sample Exam Q","topic":"Equipment & Furnishing (ATA 25)","wrong":["Behind the C/M-2 seat | In ramp storage bag","Under the C/M-1 seat | In a storage container at Frame 10","In ramp storage bag"],"id":"q0328"},{"a":"Any time that the ELT is transmitting","q":"When can the ELT Transmitting caution CAS message be observed?","source":"Sample Exam Q","topic":"Equipment & Furnishing (ATA 25)","wrong":["Only while the ELT test is being performed","When the ELT has been manually activated","When the ELT has been automatically activated"],"id":"q0329"},{"a":"The Fire Detection system is unable to detect a fire","q":"What does the Fire Det Fail caution CAS message mean?","source":"Sample Exam Q","topic":"Fire Protection (ATA 26)","wrong":["The pressure in the Fire Extinguisher Bottle is low","A Cartridge is not correctly connected to the Fire Extinguisher Bottle","The Fire Detection System has detected a fire"],"id":"q0330"},{"a":"Four (4) Extinguisher Bottles, two (2) per engine","q":"How many engine fire extinguisher bottles are there on the aircraft?","source":"Sample Exam Q","topic":"Fire Protection (ATA 26)","wrong":["Two (2) Extinguisher Bottles which can be discharged into their onside engine only","Two (2) Extinguisher Bottles which can be discharged into each engine or both into the same engine","One (1) Extinguisher Bottle which ensures extinguishing capability for one engine only"],"id":"q0331"},{"a":"On the FLT CONT DISC panel","q":"Regarding the left and right aileron channel disconnection, where can the status of the bars be checked?","source":"Sample Exam Q","topic":"Flight Controls (ATA 27)","wrong":["On the CAS strip","On the EIS (Engine Indication System) format","On the FLIGHT CONTROL panel"],"id":"q0332"},{"a":"Airspeed","q":"The Rudder Travel Control System (RTCS) modifies the rudder travel limit, in accordance with which parameter?","source":"Sample Exam Q","topic":"Flight Controls (ATA 27)","wrong":["Propeller Speed","Roll Angle","Aircraft Rate of Climb / Descent"],"id":"q0333"},{"a":"Rudder Travel Control - Increasing and reducing the maximum rudder deflection limits","q":"Which are the main functions of the Autotrim Rudder Travel Control Unit (ARTCU)?","source":"Sample Exam Q","topic":"Flight Controls (ATA 27)","wrong":["Automatic Pitch Trim and Manual Pitch Trim","Autopilot Automatic Pitch Trim","Automatic Aileron Trim and Manual Aileron Trim"],"id":"q0334"},{"a":"When the Wing and Tail De-icing System is on","q":"When does the ON light on the AOA SHIFT pushbutton illuminate?","source":"Sample Exam Q","topic":"Flight Controls (ATA 27)","wrong":["When the Ice Detector has detected icing conditions","When the SWRS has activated additional safety margins after sensing an OAT of -4°C","When the SWRS has activated additional safety margins after detecting ice formation"],"id":"q0335"},{"a":"Locks the flight controls | Allows the propeller brake and cross-bleed valve to be operated","q":"Lifting the Gust Lock Lever to the vertical position...","source":"Sample Exam Q","topic":"Flight Controls (ATA 27)","wrong":["Locks the flight controls | Allows the propeller brake and cross-bleed valve to be operated | Prevents PLs from being advanced beyond positions that can damage the propeller brake","Locks the flight controls | Prevents PLs from being advanced beyond Flight Idle (FI)","Locks the flight controls only"],"id":"q0336"},{"a":"To obtain speed values at altitudes between 19000ft and 25000ft, linear interpolation is permitted between 180 KIAS and 160 KIAS respectively.","q":"What is the maximum permitted airspeed with flaps at LNDG (23°) above 19000 ft?","source":"Sample Exam Q","topic":"Flight Controls (ATA 27)","wrong":["180 KIAS","185 KIAS","190 KIAS"],"id":"q0337"},{"a":"Using the Gravity Transfer Valve","q":"If the pressure transfer of fuel between the auxiliary and main tanks is not available due to filter clogging, what alternative means of fuel transfer is available?","source":"Sample Exam Q","topic":"Fuel (ATA 28)","wrong":["Using the Motive Flow Valve","Using the Electric Booster Pump","Using the Engine Fuel Pump"],"id":"q0338"},{"a":"To start the booster pump. Additionally, the CAS strip will display the related Fuel Level Lo caution message","q":"If the fuel level in the collector tank is too low, the fuel level sensor sends a signal...","source":"Sample Exam Q","topic":"Fuel (ATA 28)","wrong":["To open the gravity transfer valve. Additionally, the CAS strip will display the related Fuel Level Lo caution message","To open the cross-feed valve. Additionally, the CAS strip will display the related Fuel Level Lo caution message","To start the booster pump. Additionally, the CAS strip will display the related Fuel Press Lo caution message"],"id":"q0339"},{"a":"Engine Feed Jet Pumps","q":"When there is no light illuminated on the PUMPS pushbutton (on the FUEL panel), which pumps are feeding fuel from the collector tank to the engine?","source":"Sample Exam Q","topic":"Fuel (ATA 28)","wrong":["Engine Fuel Pumps","Transfer Jet Pumps","Booster Pumps"],"id":"q0340"},{"a":"Using capacitance probes which measure the fuel quantity in the tanks","q":"How is the Fuel Quantity indication calculated?","source":"Sample Exam Q","topic":"Fuel (ATA 28)","wrong":["Using floating level sensors which measure the fuel level in the tanks","Using a magnetic dipstick which measures the fuel level in the tanks","By subtracting the Fuel Used from the original Fuel On Board (FOB) indication"],"id":"q0341"},{"a":"The Fuel Heater Outlet","q":"The Eng Fuel Cold caution CAS message is displayed when low fuel temperature is sensed at...","source":"Sample Exam Q","topic":"Fuel (ATA 28)","wrong":["The Fuel Nozzles","The Mechanical Fuel Control Unit (MFCU)","The Fuel Tanks"],"id":"q0342"},{"a":"270 kg","q":"What is the maximum permitted fuel imbalance between main tanks when aircraft gross weight is less than 18000 kg?","source":"Sample Exam Q","topic":"Fuel (ATA 28)","wrong":["180 kg","90 kg","20 kg"],"id":"q0343"},{"a":"Pump #2 | Pump #3","q":"Which Hydraulic Pumps are powered by the right side of the electrical system (in normal operation)?","source":"Sample Exam Q","topic":"Hydraulics (ATA 29)","wrong":["Pump #1 | Pump #2 | Pump #3","Pump #1 | Pump #3","Pump #3"],"id":"q0344"},{"a":"PRS set to TOGA","q":"Which of the following is not a condition for automatically turning on the Hydraulic Pumps when operating in AUTO mode?","source":"Sample Exam Q","topic":"Hydraulics (ATA 29)","wrong":["Airspeed below 190 KIAS","Altitude below either 8000 ft or Airport Elevation + 2000 ft","At least one engine running"],"id":"q0345"},{"a":"Overtemperature of the Hydraulic Pump","q":"What does the illumination of the O/TEMP light on any of the HYD PUMP pushbuttons indicate?","source":"Sample Exam Q","topic":"Hydraulics (ATA 29)","wrong":["Overtemperature of the fluid in the Hydraulic Reservoir","Overtemperature of the hydraulic fluid in the return line","Overtemperature of the PUMP pushbutton lamp"],"id":"q0346"},{"a":"[A] Distribution Valves [B] Heater Blankets [C] ENG AIR INLET","q":"During Wing and Tail De-Icing System operation, to prevent the _ [A]_ from freezing, it is necessary to turn on the _ [B]_ using the _ [C] pushbutton.","source":"Sample Exam Q","topic":"Ice & Rain Protection (ATA 30)","wrong":["[A] Pressure Sensor [B] Heat Exchanger [C] ENG AIR INLET","[A] De-Icing Boots [B] Heater Blankets [C] HVY/LT ICE","[A] Pressure Sensor [B] Heating Blankets [C] ENG AIR INLET"],"id":"q0347"},{"a":"Pneum De-Ice Fail caution CAS message is shown","q":"What happens if the conditions for L+R Eng D-Ice and W&T D-Ice Fail are met simultaneously?","source":"Sample Exam Q","topic":"Ice & Rain Protection (ATA 30)","wrong":["L+R Eng D-Ice and W&T D-Ice Fail caution CAS messages are shown","Only the L+R Eng D-Ice caution CAS message is shown","Only the W&T D-Ice Fail CAS message is shown"],"id":"q0348"},{"a":"The Left Pitot Heater is failed or off","q":"What does the L Pitot Heater caution CAS message mean?","source":"Sample Exam Q","topic":"Ice & Rain Protection (ATA 30)","wrong":["The Left Pitot Tube connection to the Air Data Computer is failed","The Left Pitot Tube is frozen","The Left Pitot Heater is forced off, because the aircraft is on the ground"],"id":"q0349"},{"a":"115 V AC from the Inverters","q":"The Ice Detector is turned on with the ICE DET switch. What is it powered by?","source":"Sample Exam Q","topic":"Ice & Rain Protection (ATA 30)","wrong":["28 V DC from the DC Generators","28 V DC from the Transformer Rectifier Units (TRU)","115 V AC from the AC Generators"],"id":"q0350"},{"a":"On the Central Instrument Panel","q":"Where is the EIS SWAP pushbutton to transfer the Engine Indicating System (EIS) format between the LI AFD and the RI AFD?","source":"Sample Exam Q","topic":"Indicating & Recording (ATA 31)","wrong":["On the Control Column","On the Pedestal","On the Overhead Panel"],"id":"q0351"},{"a":"Anchors the cursor to the PFD home location","q":"Pushing the PFD key on the Cursor Control Panel (CCP)...","source":"Sample Exam Q","topic":"Indicating & Recording (ATA 31)","wrong":["Opens the Format Selection Window","Opens the top-level dialog box depending on the current position of the cursor","Anchors the cursor to the PFD gear location"],"id":"q0352"},{"a":"The PFD format is automatically displayed on MFD 1 (LI AFD)","q":"What happens when PFD 1 (LO AFD) fails?","source":"Sample Exam Q","topic":"Indicating & Recording (ATA 31)","wrong":["The LO DISPLAY knob has to be turned to OFF to force reversion of the PFD format onto MFD 1 (LI AFD)","The PFD format for the left side is lost","The DATA SOURCE REVER panel is used to switch the air data, attitude and heading sources to the cross-side"],"id":"q0353"},{"a":"The ADI is located in the upper part and the HSI in the bottom part","q":"On the Primary Flight Display (PFD) format...","source":"Sample Exam Q","topic":"Indicating & Recording (ATA 31)","wrong":["The Attitude Director Indicator (ADI) is located in the bottom part and the Horizontal Situation Indicator (HSI) in the upper part","The location of the ADI and the HSI can be adjusted by the crew","The ADI is located in the left part and the HSI in the right part"],"id":"q0354"},{"a":"Altitude tape","q":"From which PFD area can the Radio Altitude (RA) minimums be set using the associated touchscreen hotspot?","source":"Sample Exam Q","topic":"Indicating & Recording (ATA 31)","wrong":["Vertical Speed tape","Radio Altitude readout","RA Mins readout"],"id":"q0355"},{"a":"To provide the crew with real-time indications of the main aircraft systems","q":"What is the purpose of the Systems Multi-Function Window (MFW)?","source":"Sample Exam Q","topic":"Indicating & Recording (ATA 31)","wrong":["To provide maintenance personnel with diagnostic data for troubleshooting","To select the abnormal and emergency checklists associated with the aircraft systems","To tune the onboard communication and navigation radios"],"id":"q0356"},{"a":"It has not yet been acknowledged (asserted) by the flight crew by pushing the Master Caution pushbutton","q":"What is the meaning of a caution CAS message shown with a coloured background?","source":"Sample Exam Q","topic":"Indicating & Recording (ATA 31)","wrong":["Its associated abnormal checklist has been completed","The cursor is positioned over the CAS message to indicate it can be selected","It has been acknowledged (asserted) by the flight crew by pushing the master caution pushbutton"],"id":"q0357"},{"a":"By accessing the Queue page on the Checklist MFW (Multi-Function Window)","q":"One caution, two warning and then another caution CAS message have been enunciated. Where would you find all of the related checklists that need to be performed in priority order?","source":"Sample Exam Q","topic":"Indicating & Recording (ATA 31)","wrong":["By accessing the Emer page on the Checklist MFW","By accessing the Funct page on the Checklist MFW","By accessing the User page on the Checklist MFW"],"id":"q0358"},{"a":"Elevator trim-tab pointer not in the green index zone","q":"Which of the following is a condition for triggering the unsafe takeoff warning?","source":"Sample Exam Q","topic":"Indicating & Recording (ATA 31)","wrong":["Predictive Windshear (PWS) is off","Elevator and Rudder trim-tab pointers not in the green index zone","Rudder trim-tab pointer not in the green index zone"],"id":"q0359"},{"a":"It routes data between avionics systems","q":"What is the purpose of the Input/Output Concentrator (IOC) within the Integrated Avionics Processor System (IAPS)?","source":"Sample Exam Q","topic":"Indicating & Recording (ATA 31)","wrong":["It routes data to the engines","It sends data to the Flight Data Recording for recording","It controls the IAPS internal heater and cooling fan"],"id":"q0360"},{"a":"GNSS","q":"The DCU-3110 manages the system time to ensure consistency within the avionics system. Which is the primary input source used to set the system time?","source":"Sample Exam Q","topic":"Indicating & Recording (ATA 31)","wrong":["FMS","Independent Clock","AFD Internal Clock"],"id":"q0361"},{"a":"In the upper part of the rear fuselage section","q":"The Solid-State Flight Data Recorder (SSFDR) is located in which area of the aircraft?","source":"Sample Exam Q","topic":"Indicating & Recording (ATA 31)","wrong":["In the cockpit","In the central fuselage under the cargo cabin floor","In the forward fuselage under the cargo cabin floor"],"id":"q0362"},{"a":"DCU-5010","q":"The data to be recorded on the Flight Data Recorder (FDR) is concentrated by which system?","source":"Sample Exam Q","topic":"Indicating & Recording (ATA 31)","wrong":["DCU-3110","IAPS (Integrated Avionics Processor System)","FDAU (Flight Data Acquisition Unit)"],"id":"q0363"},{"a":"Chart MFW","q":"Which of the following Multi-Function Windows (MFW) is used to view notams related to terminal charts?","source":"Sample Exam Q","topic":"Indicating & Recording (ATA 31)","wrong":["Map MFW","FMS MFW","System MFW"],"id":"q0364"},{"a":"A LG Transition advisory CAS message is displayed","q":"Which one of the following is not an indication of the landing gear in transition?","source":"Sample Exam Q","topic":"Landing Gear (ATA 32)","wrong":["A red \"UNLKD\" indication is displayed for each leg on the Landing Gear Position panel","The Landing Gear Lever flashes","The triangles representing the Landing Gear on the Wheels/Hyd synoptic are red"],"id":"q0365"},{"a":"The Brake Pedals are pressed and at least one of the Brake Units does not receive sufficient pressure","q":"What does the Brake Inop caution CAS message mean?","source":"Sample Exam Q","topic":"Landing Gear (ATA 32)","wrong":["There is low pressure in the Normal Brake Accumulator","There is low pressure in the Emergency Brake Accumulator","The Brake Pedals are not pressed and there is residual pressure"],"id":"q0366"},{"a":"30 ± 3 kt","q":"Antiskid protection is automatically activated for each wheel when the related switch is in the ON position and the wheel speed is above...","source":"Sample Exam Q","topic":"Landing Gear (ATA 32)","wrong":["60 ± 3 kt","50 ± 3 kt","40 ± 3 kt"],"id":"q0367"},{"a":"150 KIAS","q":"What is the maximum permitted speed for extending the landing gear using the emergency lowering system?","source":"Sample Exam Q","topic":"Landing Gear (ATA 32)","wrong":["160 KIAS","180 KIAS","185 KIAS"],"id":"q0368"},{"a":"On the left side of the Overhead Panel","q":"Where is the EXTERNAL Lighting panel located?","source":"Sample Exam Q","topic":"Lights (ATA 33)","wrong":["On the right side of the Overhead Panel","On the ATTENDANT CONTROL panel in the rear cargo station","On the Pedestal"],"id":"q0369"},{"a":"It is activated when there is a voltage drop in the DC electrical power supply","q":"Which of the following statements is correct regarding Emergency Lighting?","source":"Sample Exam Q","topic":"Lights (ATA 33)","wrong":["It is activated when an impact of more than 6g is detected","It can only be operated from the cargo cabin","It is powered by the Hot Buses"],"id":"q0370"},{"a":"There is a difference of more than 0.3 between the left and right AOA indications","q":"What is the meaning of a (boxed, amber) AOA miscompare flag on both PFDs?","source":"Sample Exam Q","topic":"Navigation (ATA 34)","wrong":["The left AOA is failed or data is missing","The right AOA is failed or data is missing","Both left and right AOA are failed or data is missing"],"id":"q0371"},{"a":"The auxiliary pitot-static tube","q":"What does the Integrated Electronic Standby Instrument (IESI) use to compute pressure-related flight parameters (e.g. barometric altitude, airspeed)?","source":"Sample Exam Q","topic":"Navigation (ATA 34)","wrong":["The values provided by the Air Data System (ADS)","The left side pitot-static tube","The right-side pitot-static tube"],"id":"q0372"},{"a":"Lower centre of the ADI area","q":"Where is the Radio Altitude readout shown on the Primary Flight Display (PFD)?","source":"Sample Exam Q","topic":"Navigation (ATA 34)","wrong":["Directly below the Altitude Tape","On the right of the HSI area","On the Flight Mode Annunciator (FMA)"],"id":"q0373"},{"a":"On the FMS MFW > Sensors page","q":"Where can the status of Global Navigation Satellite System (GNSS) be checked?","source":"Sample Exam Q","topic":"Navigation (ATA 34)","wrong":["On the Tune MFW > Nav page","On the Maint MFW > Flight Deck Effects page","On the FMS MFW > Defaults page"],"id":"q0374"},{"a":"On LO-AFD and RO-AFD","q":"On which component is the Flight Management System (FMS) application embedded and active?","source":"Sample Exam Q","topic":"Navigation (ATA 34)","wrong":["On the LI-AFD and RI-AFD","On the DCU-5010 (Data Concentration Unit)","On the IAPS (Integrated Avionics Processor System)"],"id":"q0375"},{"a":"On the Multi-Function Keyboard (MKP) panels","q":"Where are the Flight Management System (FMS) Quick Access Keys (QAKs) located?","source":"Sample Exam Q","topic":"Navigation (ATA 34)","wrong":["On the Cursor Control Panels (CCP)","On the Single Knob Panels (SKP)","On the Control Display Units (CDU)"],"id":"q0376"},{"a":"Automatically, using the GNSS","q":"How is the FMS position calculation initialized when the system starts to operate and the aircraft is receiving valid signals from the GNSS?","source":"Sample Exam Q","topic":"Navigation (ATA 34)","wrong":["Manually, by entering a reference airport","Manually, by entering a reference waypoint","Manually, by entering a latitude and longitude"],"id":"q0377"},{"a":"Waypoints (Airports, Navaids, Intersections) and Airways","q":"Which navigation database elements can be looked up using the Search page on the FMS MFW?","source":"Sample Exam Q","topic":"Navigation (ATA 34)","wrong":["Waypoints (Airports, Navaids, Intersections) and IFR procedures (SIDs and STARS)","Airports and Terminal fixes only","Airports and Navaids only"],"id":"q0378"},{"a":"Two","q":"How many standard navigation databases can be stored concurrently stored in the FMS?","source":"Sample Exam Q","topic":"Navigation (ATA 34)","wrong":["One","Three","None"],"id":"q0379"},{"a":"FMS MFW > Setup Page","q":"In which FMS page can the transition altitude be set?","source":"Sample Exam Q","topic":"Navigation (ATA 34)","wrong":["FMS MFW > Search Page","FMS MFW > Plan Page","FMS MFW > Calc Page"],"id":"q0380"},{"a":"FMS MFW > Setup Page","q":"Where can the Predictive Receiver Autonomous Integrity Monitoring (P-RAIM) for the destination airport be checked?","source":"Sample Exam Q","topic":"Navigation (ATA 34)","wrong":["FMS MFW > Plan Page","FMS MFW > Calc Page","FMS MFW > Fly Page"],"id":"q0381"},{"a":"\"Five Hundred\" callout","q":"Which of the following aural messages will be inhibited by pushing the RALT INHIB pushbutton on the TAWS panel?","source":"Sample Exam Q","topic":"Navigation (ATA 34)","wrong":["\"Too Low Gear\" callout","\"Terrain, Terrain\" callout","\"Pull Up\" callout"],"id":"q0382"},{"a":"To identify other aircraft and ensure adequate separation between own aircraft and other traffic to avoid collisions","q":"What is the function of the Traffic and Collision Avoidance System (TCAS)?","source":"Sample Exam Q","topic":"Navigation (ATA 34)","wrong":["To receive interrogation signals from Air Traffic Control and respond to them so the aircraft can be identified by ground controllers","To provide heading information with respect to a specific ground station","To prevent Controlled Flight Into Terrain (CFIT)"],"id":"q0383"},{"a":"On the HSI and Map MFW","q":"On which formats can the Weather Radar (WXR) overlay be viewed?","source":"Sample Exam Q","topic":"Navigation (ATA 34)","wrong":["On the Synthetic Vision System (SVS)","On the Map MFW (Multi-Function Window) only","On the HSI only"],"id":"q0384"},{"a":"C/M-1 | C/M-2 | C/M-3","q":"Which crew member stations are connected to the Fixed Oxygen System?","source":"Sample Exam Q","topic":"Oxygen (ATA 35)","wrong":["C/M-1 | C/M-2 | C/M-3 | LM","C/M-1 | C/M-2","C/M-1 | C/M-2 | C/M-3 | LM | LH Rear Observer | RH Rear Observer"],"id":"q0385"},{"a":"In Frame 10 rack | On Frame 12 partition wall","q":"Where are the portable oxygen bottles located?","source":"Sample Exam Q","topic":"Oxygen (ATA 35)","wrong":["On Frame 12 partition wall | On Frame 30 lateral walls","Behind the cockpit seats | On Frame 12 partition wall","Behind the cockpit seats | In Frame 10 rack"],"id":"q0386"},{"a":"On the Overhead Panel","q":"Where is the HYDRAULIC UTILITY panel located?","source":"Sample Exam Q","topic":"Doors & Windows (ATA 52)","wrong":["On the C/M-1 Lateral Console","On the C/M-2 Lateral Console","On the Pedestal"],"id":"q0387"},{"a":"25000 ft","q":"What is the maximum permitted altitude for flying with cargo door open?","source":"Sample Exam Q","topic":"Doors & Windows (ATA 52)","wrong":["10000 ft","15000 ft","20000 ft"],"id":"q0388"},{"a":"SLPS Test OK message on CAS Strip","q":"When the FFLs are moved from START to RUN, which indication shall be checked by the crew?","source":"Sample Exam Q","topic":"Powerplant & Prop (ATA 61-80)","wrong":["\"Low Fl\" indication on EIS (Engine Indicating System) format","Overspeed Governor limits","NH below 70%"],"id":"q0389"},{"a":"On the Overhead Panel","q":"Where are the controls for manual feathering located?","source":"Sample Exam Q","topic":"Powerplant & Prop (ATA 61-80)","wrong":["On the C/M-2 Lateral Console","On the Pedestal","On the C/M-1 Lateral Console"],"id":"q0390"},{"a":"Fuel Feather Lever (FFL)","q":"Which cockpit control opens and closes the Fuel Shut-off Valve?","source":"Sample Exam Q","topic":"Powerplant & Prop (ATA 61-80)","wrong":["Power Rating Selector (PRS)","Fuel Pump switch","Power Lever (PL)"],"id":"q0391"},{"a":"Engine Fuel Pump","q":"Which component generates the fuel pressure that the nozzles need to spray the fuel in the combustion chamber?","source":"Sample Exam Q","topic":"Powerplant & Prop (ATA 61-80)","wrong":["Fuel Booster Pump","Mechanical Fuel Control Unit (MFCU)","Flow Divider"],"id":"q0392"},{"a":"The exciters stay powered until the IGN pushbutton is released","q":"Which of the following statements is correct regarding the Ignition system?","source":"Sample Exam Q","topic":"Powerplant & Prop (ATA 61-80)","wrong":["The exciters are only powered when FFL is moved to START","The exciters are only powered when NH is greater than 15%","The exciters are only used by the autoignition circuit"],"id":"q0393"}]</script>
+<script>
+(function(){
+'use strict';
+
+/* ---------- helpers ---------- */
+const $ = (s, el) => (el || document).querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const lsGet = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } };
+function seedQuestions() {
+  try {
+    const el = document.getElementById('seed'), a = el ? JSON.parse(el.textContent) : [];
+    return Array.isArray(a) ? a.filter(d => d && d.id && d.q && d.a).map(fixSource) : [];
+  } catch (e) { return []; }
+}
+/* With no shared database (a downloaded or exported copy of the page), the questions come from this browser's saved copy,
+   or, the first time, from the snapshot of the bank that is built into the page. */
+/* A copy saved from an older snapshot still picks up the questions added since, but a question you deleted from your copy is not brought back.
+   "qb:seedids" remembers which questions the snapshot has already delivered; snapshots made before it held q0001 to q0303. */
+const LEGACY_SEED_MAX = 303;
+const SEED_AMENDS = [
+  { id: 'q0044', field: 'a', from: 'At the bottom of the HSI', to: 'Lower centre of the ADI area' },
+  { id: 'q0041', field: 'q', from: 'Where can you select the ADI & HIS config boxes', to: 'Where can you select the ADI & HSI config boxes' },
+  { id: 'q0109', field: 'a', from: 'AC Synoptic', to: 'Air Conditioning Synoptic' },
+  { id: 'q0224', field: 'a', from: 'Engine & cruise syn / EIS & Engine syn', to: 'NL; Engine & Cruise Synoptic, PRS; EIS & Engine synoptic' },
+  { id: 'q0281', field: 'q', from: 'Which component does the quantity of fuel delivered to the engine', to: 'Which component determines the right quantity of fuel to the engine' }
+];
+function loadLocalQuestions() {
+  const seed = seedQuestions();
+  let saved = lsGet('qb:questions', []);
+  if (!Array.isArray(saved) || !saved.length) {
+    if (seed.length) { lsSet('qb:questions', seed); lsSet('qb:seedids', seed.map(d => d.id)); }
+    return seed;
+  }
+  saved = saved.map(fixSource);
+  const seen = new Set(lsGet('qb:seedids', null) || seed.filter(d => idNum(d.id) <= LEGACY_SEED_MAX).map(d => d.id));
+  const byId = new Map(saved.map(d => [d.id, d]));
+  let next = Math.max.apply(null, saved.concat(seed).map(d => idNum(d.id)).concat([0]));
+  let changed = false;
+  for (const d of seed) {
+    if (seen.has(d.id)) continue;
+    const mine = byId.get(d.id);
+    if (!mine) { saved.push(d); byId.set(d.id, d); changed = true; }
+    else if (mine.q !== d.q) { const nd = Object.assign({}, d, { id: 'q' + String(++next).padStart(4, '0') }); saved.push(nd); byId.set(nd.id, nd); changed = true; }
+  }
+  saved = saved.map(d => { let out = d; for (const f of SEED_AMENDS) if (f.id === d.id && d[f.field] === f.from) { out = Object.assign({}, out, { [f.field]: f.to }); changed = true; } return out; });
+  if (changed) { saved.sort((a, b) => idNum(a.id) - idNum(b.id)); lsSet('qb:questions', saved); }
+  if (seed.length) lsSet('qb:seedids', seed.map(d => d.id));
+  return saved;
+}
+const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+const MODES = ['library', 'flashcards', 'quiz'];
+const S = {
+  mode: 'library',
+  qs: [], map: new Map(), loaded: false, source: 'loading', canWrite: true, sig: '',
+  progress: lsGet('qb:progress', {}), flags: lsGet('qb:flags', {}), flagOnly: false,
+  search: '', topic: 'all', srcFilter: 'all', importOpen: false, edit: null,
+  fcOpts: { topic: 'all', source: 'all', shuffle: false, hideKnown: false, flagOnly: false }, fc: null, fcBuiltFor: -1,
+  qzOpts: { topic: 'all', source: 'all', count: 10, repeat: true, weakOnly: false, flagOnly: false }, qz: null,
+  stats: lsGet('qb:stats', {})
+};
+let db = null;
+const view = $('#view');
+
+/* ---------- data model ---------- */
+/* where a question came from: "Prog Check", "Real Exam Q" or "Sample Exam Q" (stored in the source field). "Prog Test" is the same thing as "Prog Check", so it is always shown as "Prog Check". */
+const SRC_RE = /\s*\((Prog Test|Prog Check|Real Exam Q|Sample Exam Q)\)\s*$/i;
+const SRC_NAMES = { 'prog test': 'Prog Check', 'prog check': 'Prog Check', 'real exam q': 'Real Exam Q', 'sample exam q': 'Sample Exam Q' };
+const canonSource = s => { const t = String(s == null ? '' : s).trim(); return SRC_NAMES[t.toLowerCase()] || t; };
+function splitTag(q) {
+  const m = SRC_RE.exec(q || '');
+  return m ? { q: q.slice(0, m.index), source: SRC_NAMES[m[1].toLowerCase()] } : { q: q, source: '' };
+}
+function fixSource(d) {
+  if (d.source) { const c = canonSource(d.source); return c === d.source ? d : Object.assign({}, d, { source: c }); }
+  const sp = splitTag(d.q);
+  return sp.source ? Object.assign({}, d, { q: sp.q, source: sp.source }) : d;
+}
+const SRC_ORDER = ['Real Exam Q', 'Sample Exam Q', 'Prog Check'];
+const ARROW_L = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>';
+const ARROW_R = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+const srcChip = x => x.source ? `<span class="src${/real/i.test(x.source) ? ' real' : /sample/i.test(x.source) ? ' sample' : ''}">${esc(x.source)}</span>` : '';
+function normalize(raw) {
+  raw = raw || {};
+  let q = String(raw.q != null ? raw.q : (raw.question != null ? raw.question : '')).trim();
+  let a = raw.a != null ? raw.a : raw.answer;
+  let wrong = raw.wrong || raw.distractors || raw.incorrect || [];
+  const opts = raw.options || raw.choices;
+  if (Array.isArray(opts) && opts.length) {
+    const list = opts.map(o => String(o).trim());
+    if (typeof a === 'number' && list[a] != null) a = list[a];
+    else if (/^[A-Za-z]$/.test(String(a == null ? '' : a).trim())) a = list[String(a).trim().toUpperCase().charCodeAt(0) - 65] || a;
+    wrong = list.filter(o => o !== String(a).trim());
+  }
+  a = String(a == null ? '' : a).trim();
+  if (!q || !a) return null;
+  let source = String(raw.source != null ? raw.source : '').trim();
+  const sp = splitTag(q); q = sp.q; if (!source) source = sp.source;
+  source = canonSource(source);
+  if (!Array.isArray(wrong)) wrong = [];
+  wrong = wrong.map(x => String(x).trim()).filter((x, i, arr) => x && x !== a && arr.indexOf(x) === i);
+  const out = {
+    q, a, wrong,
+    topic: String(raw.topic != null ? raw.topic : (raw.category != null ? raw.category : (raw.section || ''))).trim(),
+    note: String(raw.note != null ? raw.note : (raw.explanation || '')).trim()
+  };
+  if (source) out.source = source;
+  if (raw.sample) out.sample = true;
+  return out;
+}
+const idNum = id => { const m = /^q(\d+)$/.exec(id); return m ? parseInt(m[1], 10) : 0; };
+const qlabel = q => 'Q ' + String(idNum(q.id)).padStart(3, '0');
+const sources = () => {
+  const found = Array.from(new Set(S.qs.map(q => q.source).filter(Boolean)));
+  const rank = s => { const i = SRC_ORDER.indexOf(s); return i < 0 ? 99 : i; };
+  return found.sort((a, b) => rank(a) - rank(b) || a.localeCompare(b));
+};
+const topics = () => Array.from(new Set(S.qs.map(q => q.topic).filter(Boolean))).sort((a, b) => a.localeCompare(b));
+const strip = d => { const o = Object.assign({}, d); delete o.id; return o; };
+
+async function withRetry(fn) {
+  try { return await fn(); }
+  catch (e) {
+    if (e && (e.code === 'resource_exhausted' || e.code === 'unavailable')) { await sleep(700 + Math.random() * 500); return fn(); }
+    throw e;
+  }
+}
+async function runPool(items, fn, n) {
+  let idx = 0; const errs = [];
+  const workers = Array.from({ length: Math.min(n, items.length) }, async () => {
+    while (idx < items.length) { const it = items[idx++]; try { await withRetry(() => fn(it)); } catch (e) { errs.push(e); } }
+  });
+  await Promise.all(workers);
+  return errs;
+}
+/* ---------- each person's own study record ----------
+   A person's missed questions ("weak") and flashcard marks are saved under their own account (data/users/<id>),
+   which the platform keeps private to them, so two people sharing this page never see or mix each other's results.
+   A copy is also cached in this browser under that person's id, and used on its own when nobody is signed in. */
+const study = { uid: null, name: '', col: null, ok: false, pend: new Set(), timer: null, tries: 0, first: true };
+function saveStudy() {
+  lsSet(study.uid ? 'qb:progress:' + study.uid : 'qb:progress', S.progress);
+  lsSet(study.uid ? 'qb:stats:' + study.uid : 'qb:stats', S.stats);
+  lsSet(study.uid ? 'qb:flags:' + study.uid : 'qb:flags', S.flags);
+}
+function touch(id) {
+  saveStudy();
+  if (!study.ok) return;
+  study.pend.add(id); clearTimeout(study.timer); study.timer = setTimeout(flushStudy, 500);
+}
+async function flushStudy() {
+  if (!study.ok || !study.pend.size) return;
+  const ids = Array.from(study.pend); study.pend.clear();
+  const errs = await runPool(ids, id => {
+    const st = S.stats[id], pr = S.progress[id], fl = S.flags[id];
+    return (!st && !pr && !fl) ? study.col.doc(id).delete() : study.col.doc(id).set(Object.assign({ w: st ? st.w : 0, s: st ? st.s : 0, p: pr || null }, fl ? { f: true } : {}));
+  }, 4);
+  if (errs.length) {
+    ids.forEach(id => study.pend.add(id));
+    if (++study.tries >= 3) { study.ok = false; renderWho(); return; }
+    clearTimeout(study.timer); study.timer = setTimeout(flushStudy, 4000 * study.tries);
+  } else { study.tries = 0; }
+}
+function adoptLocal(uid) {
+  study.uid = uid;
+  let st = lsGet('qb:stats:' + uid, null), pr = lsGet('qb:progress:' + uid, null), fl = lsGet('qb:flags:' + uid, null);
+  if (st === null && pr === null) {
+    /* first visit by this person on this browser since results became personal: take over the older shared copy once */
+    st = lsGet('qb:stats', {}); pr = lsGet('qb:progress', {});
+    try { localStorage.removeItem('qb:stats'); localStorage.removeItem('qb:progress'); } catch (e) {}
+  }
+  if (fl === null) { fl = lsGet('qb:flags', {}); try { localStorage.removeItem('qb:flags'); } catch (e) {} }
+  S.stats = st || {}; S.progress = pr || {}; S.flags = fl || {};
+  saveStudy();
+}
+function studyChanged() {
+  if (S.mode === 'library') updateLibrary();
+  else if (S.mode === 'flashcards') renderFlash();
+  else if (S.mode === 'quiz' && (!S.qz || S.qz.phase !== 'run')) renderQuiz();
+}
+function startStudySync() {
+  study.ok = true;
+  study.col.onSnapshot(snap => {
+    const stats = {}, prog = {}, flags = {};
+    snap.docs.forEach(d => {
+      const v = d.data() || {};
+      if (v.w > 0 || v.s > 0) stats[d.id] = { w: v.w | 0, s: v.s | 0 };
+      if (v.p === 'known' || v.p === 'again') prog[d.id] = v.p;
+      if (v.f === true) flags[d.id] = true;
+    });
+    const remoteIds = new Set(snap.docs.map(d => d.id));
+    if (study.first) {
+      /* anything this browser already knows that the account does not yet have is sent up, not thrown away */
+      study.first = false;
+      new Set(Object.keys(S.stats).concat(Object.keys(S.progress), Object.keys(S.flags))).forEach(id => { if (!remoteIds.has(id)) study.pend.add(id); });
+      if (study.pend.size) { clearTimeout(study.timer); study.timer = setTimeout(flushStudy, 300); }
+    }
+    study.pend.forEach(id => {
+      if (S.stats[id]) stats[id] = S.stats[id]; else delete stats[id];
+      if (S.progress[id]) prog[id] = S.progress[id]; else delete prog[id];
+      if (S.flags[id]) flags[id] = true; else delete flags[id];
+    });
+    const before = JSON.stringify([S.stats, S.progress, S.flags]);
+    S.stats = stats; S.progress = prog; S.flags = flags; saveStudy();
+    if (JSON.stringify([S.stats, S.progress, S.flags]) !== before) studyChanged();
+  }, () => { study.ok = false; renderWho(); });
+}
+function renderWho() {
+  const el = $('#who'); if (!el) return;
+  el.textContent = '';
+  if (!study.uid) return;
+  if (!study.ok) el.textContent = 'Could not save to your account, so your results are saved in this browser only.';
+}
+
+const store = {
+  async add(items) {
+    let n = S.qs.reduce((m, q) => Math.max(m, idNum(q.id)), 0) + 1;
+    const docs = items.map(it => Object.assign({ id: 'q' + String(n++).padStart(4, '0') }, it));
+    if (db) {
+      const errs = await runPool(docs, d => db.collection('questions').doc(d.id).set(strip(d)), 4);
+      if (errs.length) throw new Error(errs.length + ' of ' + docs.length + ' could not be saved (' + (errs[0].message || errs[0].code || 'error') + ').');
+    } else {
+      S.qs = S.qs.concat(docs); lsSet('qb:questions', S.qs); refresh();
+    }
+    return docs.length;
+  },
+  async update(id, doc) {
+    const full = Object.assign({ id: id }, doc);
+    if (db) {
+      await withRetry(() => db.collection('questions').doc(id).set(strip(full)));
+      S.qs = S.qs.map(q => q.id === id ? full : q); refresh();
+    } else {
+      S.qs = S.qs.map(q => q.id === id ? full : q); lsSet('qb:questions', S.qs); refresh();
+    }
+  },
+  async remove(ids) {
+    if (db) {
+      const errs = await runPool(ids, id => db.doc('questions/' + id).delete(), 4);
+      if (errs.length) throw new Error('Some questions could not be deleted.');
+    } else {
+      const set = new Set(ids); S.qs = S.qs.filter(q => !set.has(q.id)); lsSet('qb:questions', S.qs); refresh();
+    }
+  }
+};
+
+function toast(msg) {
+  const t = $('#toast'); t.textContent = msg; t.hidden = false;
+  clearTimeout(toast.t); toast.t = setTimeout(() => { t.hidden = true; }, 3200);
+}
+
+/* ---------- shell ---------- */
+function renderTabs() {
+  MODES.forEach(m => {
+    const b = $('#tab-' + m); b.setAttribute('aria-selected', String(S.mode === m));
+  });
+  const small = $('#tab-library small'); small.textContent = S.loaded ? S.qs.length : '';
+}
+function setMode(m) {
+  S.mode = m;
+  try { history.replaceState(null, '', '#' + m); } catch (e) {}
+  render(); window.scrollTo(0, 0);
+}
+function render() {
+  setWide(false);
+  renderTabs();
+  if (S.mode === 'library') renderLibrary();
+  else if (S.mode === 'flashcards') renderFlash();
+  else renderQuiz();
+}
+function refresh() {
+  S.map = new Map(S.qs.map(q => [q.id, q]));
+  renderTabs();
+  const sig = (S.loaded ? 'L' : 'x') + (S.qs.length ? 'n' : '0');
+  if (S.mode === 'library') updateLibrary();
+  else if (sig !== S.sig) render();
+  S.sig = sig;
+}
+
+function emptyBank(what) {
+  return `<div class="notice">
+    <h3>No questions in the bank yet</h3>
+    <p>${what} needs questions to work with. Add some in the Library, or ask Claude to load the answers from your PDF.</p>
+    <button class="btn primary" data-act="mode" data-mode="library">Go to Library</button>
+  </div>`;
+}
+function sourceOptions(sel, topic) {
+  const inTopic = q => !topic || topic === 'all' || q.topic === topic;
+  return `<option value="all">All sources</option>` +
+    sources().map(t => `<option value="${esc(t)}"${t === sel ? ' selected' : ''}>${esc(t)} (${S.qs.filter(q => q.source === t && inTopic(q)).length})</option>`).join('');
+}
+function topicOptions(sel) {
+  return `<option value="all">All topics (${S.qs.length})</option>` +
+    topics().map(t => `<option value="${esc(t)}"${t === sel ? ' selected' : ''}>${esc(t)} (${S.qs.filter(q => q.topic === t).length})</option>`).join('');
+}
+
+/* ---------- library ---------- */
+/* ---------- flags ---------- */
+const FLAG_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg>';
+const flagCount = () => S.qs.reduce((n, q) => n + (S.flags[q.id] ? 1 : 0), 0);
+function flagBtn(id, icon) {
+  const on = !!S.flags[id], label = on ? 'Remove flag' : 'Flag this question to come back to it';
+  return `<button type="button" class="flagbtn${icon ? ' icon' : ''}" data-act="flag" data-id="${esc(id)}" aria-pressed="${on}" aria-label="${icon ? label : (on ? 'Flagged' : 'Flag')}" title="${label} (F)">${FLAG_SVG}${icon ? '' : `<span>${on ? 'Flagged' : 'Flag'}</span>`}</button>`;
+}
+const flagChip = id => S.flags[id] ? `<span class="flagchip" title="Flagged">${FLAG_SVG}Flagged</span>` : '';
+function toggleFlag(id) {
+  if (!id || !S.map.has(id)) return;
+  if (S.flags[id]) delete S.flags[id]; else S.flags[id] = true;
+  touch(id);
+  const a = document.activeElement;
+  const sel = a && a.id ? '#' + a.id : (a && a.dataset && a.dataset.act === 'flag') ? '.flagbtn[data-id="' + a.dataset.id + '"]' : null;
+  if (S.mode === 'library') updateLibrary();
+  else if (S.mode === 'flashcards') renderFlash();
+  else if (S.mode === 'quiz' && S.qz && S.qz.phase === 'run') renderQuizRun();
+  if (sel) { const e = $(sel); if (e) e.focus({ preventScroll: true }); }
+}
+function renderLibrary() {
+  view.innerHTML = `
+  <section>
+    <div class="lib-head">
+      <div><h2>Questions</h2><p class="sub" id="lib-sub">&nbsp;</p></div>
+      <div class="lib-actions" id="lib-actions"></div>
+    </div>
+    <div class="import" id="import" ${S.importOpen ? '' : 'hidden'}>
+      <h3>Add questions</h3>
+      <p class="msg">Paste a JSON list, or choose a .json file. Each item needs <code>q</code> and <code>a</code>. Add <code>wrong</code> (other answer options), <code>topic</code> and <code>note</code> if you have them. Without <code>wrong</code>, the quiz borrows options from other answers in the bank.</p>
+<pre>[
+  { "q": "Which organelle produces most of a cell's ATP?",
+    "a": "The mitochondrion",
+    "wrong": ["The Golgi apparatus", "The ribosome", "The lysosome"],
+    "topic": "Cell biology",
+    "note": "Oxidative phosphorylation happens on the inner membrane." }
+]</pre>
+      <label class="sr" for="importText">Questions as JSON</label>
+      <textarea id="importText" spellcheck="false" placeholder="Paste JSON here"></textarea>
+      <div class="row">
+        <button class="btn primary" data-act="do-import" id="btn-do-import">Add to bank</button>
+        <label class="btn" for="importFile">Choose .json file</label>
+        <input class="sr" type="file" id="importFile" accept=".json,application/json">
+        <button class="btn ghost" data-act="close-import">Close</button>
+      </div>
+      <p class="msg" id="importMsg" role="status"></p>
+    </div>
+    <div class="toolbar">
+      <div class="field"><span class="sr">Search</span><input id="search" type="search" placeholder="Search questions and answers" aria-label="Search questions" value="${esc(S.search)}"></div>
+      <div class="field"><span class="sr">Topic</span><select id="topic" aria-label="Filter by topic"></select></div>
+      <div class="field"><span class="sr">Source</span><select id="source" aria-label="Filter by source"></select></div>
+      <div class="field" id="lib-flag"></div>
+    </div>
+    <div id="lib-body"></div>
+  </section>`;
+  updateLibrary();
+}
+function updateLibrary() {
+  if (S.mode !== 'library' || !$('#lib-body')) return;
+  if (S.edit && S.edit.id !== 'new' && S.loaded && !S.map.has(S.edit.id)) S.edit = null;
+  const nf = flagCount();
+  if (S.flagOnly && !nf) S.flagOnly = false;
+  const list = filteredQs();
+  if (S.edit && S.edit.id !== 'new' && !list.some(q => q.id === S.edit.id)) { const cur = S.map.get(S.edit.id); if (cur) list.unshift(cur); }
+  const nt = topics().length;
+  $('#lib-sub').textContent = S.loaded
+    ? `${S.qs.length} question${S.qs.length === 1 ? '' : 's'}${nt ? ` · ${nt} topic${nt === 1 ? '' : 's'}` : ''}${list.length !== S.qs.length ? ` · ${list.length} shown` : ''}`
+    : 'Loading questions';
+  const hasEx = S.qs.some(q => q.sample);
+  $('#lib-actions').innerHTML =
+    (S.canWrite ? '<button class="btn primary" data-act="ed-new">Add question</button>' : '') +
+    (S.canWrite ? '<button class="btn" data-act="open-import">Import</button>' : '') +
+    (S.qs.length ? '<button class="btn" data-act="export">Copy as JSON</button>' : '') +
+    (S.canWrite && hasEx ? '<button class="btn ghost" data-act="rm-examples">Remove examples</button>' : '');
+  const tb = $('.toolbar'); if (tb) tb.classList.toggle('hasflag', !!(nf || S.flagOnly));
+  $('#lib-flag').innerHTML = nf || S.flagOnly ? `<button type="button" class="flagbtn big" data-act="lib-flagfilter" aria-pressed="${S.flagOnly}" title="Show only the questions you flagged">${FLAG_SVG}<span>Flagged (${nf})</span></button>` : '';
+  const sel = $('#topic');
+  if (S.topic !== 'all' && !topics().includes(S.topic)) S.topic = 'all';
+  sel.innerHTML = topicOptions(S.topic);
+  if (S.srcFilter !== 'all' && !sources().includes(S.srcFilter)) S.srcFilter = 'all';
+  $('#source').innerHTML = sourceOptions(S.srcFilter, S.topic);
+  const body = $('#lib-body');
+  if (!S.loaded) { body.innerHTML = '<div class="qlist"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>'; return; }
+  /* keep the cursor where it was if the editor is redrawn while the person is typing */
+  const ae = document.activeElement;
+  const fk = ae && ae.closest && ae.closest('.editor') && ae.name ? { name: ae.name, s: ae.selectionStart, e: ae.selectionEnd } : null;
+  const addBox = S.edit && S.edit.id === 'new' ? `<div class="edwrap">${editorHtml(S.edit)}</div>` : '';
+  let html;
+  if (!S.qs.length) {
+    html = addBox + `<div class="notice">
+      <h3>The bank is empty</h3>
+      <p>${S.canWrite ? 'Add a question, or import a JSON list to fill it.' : 'Ask the owner of this page to load questions.'}</p>
+      ${S.canWrite && !addBox ? '<button class="btn primary" data-act="ed-new">Add a question</button>' : ''}
+      ${S.canWrite ? '<button class="btn" data-act="open-import">Import questions</button>' : ''}
+    </div>`;
+  } else if (!list.length) {
+    html = addBox + '<div class="notice"><h3>Nothing matches</h3><p>Try a different search, topic or source.</p></div>';
+  } else {
+    html = addBox + '<ul class="qlist">' + list.map(q => S.edit && S.edit.id === q.id ? `<li class="qitem editing" data-qid="${esc(q.id)}">${editorHtml(S.edit)}</li>` : itemHtml(q)).join('') + '</ul>';
+  }
+  body.innerHTML = html;
+  if (fk) {
+    const el = body.querySelector('.editor [name="' + fk.name + '"]');
+    if (el) { el.focus({ preventScroll: true }); try { el.setSelectionRange(fk.s, fk.e); } catch (err) {} }
+  }
+}
+
+/* ---------- add and edit a question ---------- */
+const edBlank = () => ({ q: '', a: '', wr: ['', '', ''], topic: S.topic !== 'all' ? S.topic : '', source: S.srcFilter !== 'all' ? S.srcFilter : '', note: '' });
+function edFromDoc(q) {
+  const wr = (q.wrong || []).slice(); while (wr.length < 3) wr.push('');
+  return { q: q.q || '', a: q.a || '', wr: wr, topic: q.topic || '', source: q.source || '', note: q.note || '' };
+}
+function editorHtml(e) {
+  const d = e.d, isNew = e.id === 'new';
+  const cur = canonSource(d.source);
+  const srcs = Array.from(new Set(SRC_ORDER.concat(sources())));
+  if (cur && !srcs.includes(cur)) srcs.push(cur);
+  return `<form class="editor" data-editor novalidate autocomplete="off">
+    <h3>${isNew ? 'Add a question' : 'Edit ' + qlabel({ id: e.id })}</h3>
+    <label class="field"><span>Question</span><textarea name="q" rows="3">${esc(d.q)}</textarea></label>
+    <label class="field"><span>Correct answer</span><textarea name="a" rows="2">${esc(d.a)}</textarea></label>
+    <div class="field"><span>Wrong answers</span><div class="wrongs">${d.wr.map((v, i) => `<input type="text" name="w${i}" value="${esc(v)}" placeholder="Wrong answer ${i + 1}" aria-label="Wrong answer ${i + 1}">`).join('')}</div></div>
+    <div class="two">
+      <label class="field"><span>Topic</span><input type="text" name="topic" list="topic-list" value="${esc(d.topic)}"></label>
+      <label class="field"><span>Source</span><select name="source"><option value="">No source</option>${srcs.map(x => `<option value="${esc(x)}"${x === cur ? ' selected' : ''}>${esc(x)}</option>`).join('')}</select></label>
+    </div>
+    <label class="field"><span>Note, shown after answering</span><input type="text" name="note" value="${esc(d.note)}"></label>
+    <datalist id="topic-list">${topics().map(t => `<option value="${esc(t)}">`).join('')}</datalist>
+    <p class="msg err" role="alert">${esc(e.msg || '')}</p>
+    <div class="row"><button type="submit" class="btn primary" ${e.busy ? 'disabled' : ''}>${isNew ? 'Add question' : 'Save changes'}</button><button type="button" class="btn ghost" data-act="ed-cancel">${isNew ? 'Close' : 'Cancel'}</button></div>
+  </form>`;
+}
+function edRead() {
+  const f = $('.editor'); if (!f || !S.edit) return;
+  Array.from(f.elements).forEach(el => {
+    const n = el.name; if (!n) return;
+    const m = /^w(\d+)$/.exec(n);
+    if (m) S.edit.d.wr[parseInt(m[1], 10)] = el.value; else S.edit.d[n] = el.value;
+  });
+}
+function edFocus(name, center) {
+  const el = $('.editor [name="' + name + '"]'); if (!el) return;
+  el.focus({ preventScroll: true });
+  try { el.scrollIntoView({ block: center ? 'center' : 'nearest' }); } catch (err) {}
+}
+async function edSave() {
+  const e = S.edit; if (!e || e.busy) return;
+  edRead();
+  const d = e.d, isNew = e.id === 'new';
+  const fail = (m, field) => { e.msg = m; e.busy = false; updateLibrary(); if (field) edFocus(field); };
+  let q = d.q.trim(); const a = d.a.trim();
+  if (!q) return fail('Write the question.', 'q');
+  if (!a) return fail('Write the correct answer.', 'a');
+  const sp = splitTag(q); q = sp.q; let source = canonSource(d.source) || sp.source;
+  const wrong = d.wr.map(x => x.trim()).filter((x, i, arr) => x && arr.indexOf(x) === i);
+  if (wrong.some(x => x.toLowerCase() === a.toLowerCase())) return fail('One of the wrong answers is the same as the correct answer.', 'a');
+  const k = q.toLowerCase(), orig = isNew ? null : S.map.get(e.id);
+  if (!isNew && !orig) { S.edit = null; updateLibrary(); toast('That question no longer exists'); return; }
+  if (!(orig && orig.q.trim().toLowerCase() === k)) {
+    const clash = S.qs.find(x => x.id !== e.id && x.q.trim().toLowerCase() === k);
+    if (clash) return fail('That question is already in the bank (' + qlabel(clash) + ').', 'q');
+  }
+  const out = Object.assign({}, orig || {}); delete out.id;
+  out.q = q; out.a = a; out.wrong = wrong; out.topic = d.topic.trim();
+  const note = d.note.trim(); if (note) out.note = note; else delete out.note;
+  if (source) out.source = source; else delete out.source;
+  e.busy = true; e.msg = ''; updateLibrary();
+  try {
+    if (isNew) {
+      const label = qlabel({ id: 'q' + (S.qs.reduce((m, x) => Math.max(m, idNum(x.id)), 0) + 1) });
+      await store.add([out]);
+      S.edit = Object.assign({}, e, { d: Object.assign(edBlank(), { topic: d.topic, source: d.source }), msg: '', busy: false });
+      updateLibrary(); edFocus('q'); toast('Added ' + label);
+    } else {
+      await store.update(e.id, out);
+      const id = e.id; S.edit = null; updateLibrary(); toast('Saved ' + qlabel({ id: id }));
+      const li = $('[data-qid="' + id + '"]'); if (li) li.scrollIntoView({ block: 'nearest' });
+    }
+  } catch (err) { fail('Could not save: ' + (err && (err.message || err.code) || 'unknown error')); }
+}
+function filteredQs() {
+  const t = S.search.trim().toLowerCase();
+  return S.qs.filter(q => (S.topic === 'all' || q.topic === S.topic) && (S.srcFilter === 'all' || q.source === S.srcFilter) && (!S.flagOnly || S.flags[q.id]) &&
+    (!t || (q.q + ' ' + q.a + ' ' + (q.topic || '') + ' ' + (q.source || '') + ' ' + (q.note || '')).toLowerCase().includes(t)));
+}
+function itemHtml(q) {
+  const st = S.progress[q.id];
+  const stl = st === 'known' ? '<span class="st known">Known</span>' : st === 'again' ? '<span class="st again">Learning</span>' : '';
+  return `<li class="qitem${S.flags[q.id] ? ' flagged' : ''}" data-qid="${esc(q.id)}"><div class="qbody">
+      <div class="qmeta"><span class="mono">${qlabel(q)}</span>${flagChip(q.id)}${q.topic ? `<span class="topic">${esc(q.topic)}</span>` : ''}${srcChip(q)}${q.sample ? '<span class="tag-ex">Example</span>' : ''}${stl}</div>
+      <p class="qtext">${esc(q.q)}</p>
+      <p class="atext"><span class="lbl">ANS</span>${esc(q.a)}</p>
+    </div><div class="qact">${flagBtn(q.id, true)}${S.canWrite ? `<button class="btn small" data-act="ed-edit" data-id="${esc(q.id)}">Edit</button><button class="btn small ghost" data-act="del" data-id="${esc(q.id)}">Delete</button>` : ''}</div></li>`;
+}
+async function doImport() {
+  const ta = $('#importText'), msg = $('#importMsg'), btn = $('#btn-do-import');
+  const say = (t, c) => { msg.textContent = t; msg.className = 'msg ' + (c || ''); };
+  let data;
+  try { data = JSON.parse(ta.value); } catch (e) { say('That is not valid JSON. Check for a missing comma or quote.', 'err'); return; }
+  if (data && !Array.isArray(data)) data = data.questions;
+  if (!Array.isArray(data)) { say('Expected a list of questions, or an object with a "questions" list.', 'err'); return; }
+  const seen = new Set(S.qs.map(q => q.q.trim().toLowerCase()));
+  const items = []; let bad = 0, dup = 0;
+  data.forEach(r => {
+    const n = normalize(r);
+    if (!n) { bad++; return; }
+    const k = n.q.toLowerCase();
+    if (seen.has(k)) { dup++; return; }
+    seen.add(k); items.push(n);
+  });
+  if (!items.length) { say(dup ? 'Every question in that list is already in the bank.' : 'No usable questions found. Each needs a "q" and an "a".', 'err'); return; }
+  btn.disabled = true; say('Saving ' + items.length + ' questions');
+  try {
+    const n = await store.add(items);
+    ta.value = '';
+    say(`Added ${n} question${n === 1 ? '' : 's'}${dup ? `, skipped ${dup} already in the bank` : ''}${bad ? `, skipped ${bad} without a question or answer` : ''}.`, 'ok');
+  } catch (e) { say('Could not save: ' + (e.message || e.code || 'unknown error'), 'err'); }
+  btn.disabled = false;
+}
+function exportJson() {
+  const out = S.qs.map(q => { const o = { q: q.q, a: q.a }; if (q.wrong && q.wrong.length) o.wrong = q.wrong; if (q.topic) o.topic = q.topic; if (q.source) o.source = q.source; if (q.note) o.note = q.note; return o; });
+  const text = JSON.stringify(out, null, 2);
+  const fallback = () => {
+    S.importOpen = true; renderLibrary();
+    $('#importText').value = text; $('#importText').select();
+    $('#importMsg').textContent = 'Copy is blocked here. The JSON is in the box, select it and copy.';
+  };
+  try { navigator.clipboard.writeText(text).then(() => toast('Copied ' + out.length + ' questions as JSON'), fallback); } catch (e) { fallback(); }
+}
+function arm(b, label, fn) {
+  if (b.dataset.armed) { fn(); return; }
+  const orig = b.textContent; b.dataset.armed = '1'; b.textContent = label; b.classList.add('danger');
+  setTimeout(() => { if (b.isConnected) { delete b.dataset.armed; b.textContent = orig; b.classList.remove('danger'); } }, 3000);
+}
+
+/* ---------- flashcards ---------- */
+function fcBuild() {
+  const o = S.fcOpts;
+  let list = S.qs.filter(q => (o.topic === 'all' || q.topic === o.topic) && (o.source === 'all' || q.source === o.source));
+  if (o.flagOnly && !flagCount()) o.flagOnly = false;
+  if (o.flagOnly) list = list.filter(q => S.flags[q.id]);
+  if (o.hideKnown) list = list.filter(q => S.progress[q.id] !== 'known');
+  if (o.shuffle) list = shuffle(list);
+  S.fc = { deck: list.map(q => q.id), i: 0, flipped: false, done: false };
+  S.fcBuiltFor = S.qs.length;
+}
+function renderFlash() {
+  if (!S.loaded) { view.innerHTML = '<div class="skel"></div>'; return; }
+  if (!S.qs.length) { view.innerHTML = emptyBank('Flashcards'); return; }
+  if (S.fcOpts.topic !== 'all' && !topics().includes(S.fcOpts.topic)) S.fcOpts.topic = 'all';
+  if (S.fcOpts.source !== 'all' && !sources().includes(S.fcOpts.source)) S.fcOpts.source = 'all';
+  if (!S.fc || S.fcBuiltFor !== S.qs.length) fcBuild();
+  const f = S.fc, o = S.fcOpts;
+  f.deck = f.deck.filter(id => S.map.has(id));
+  if (f.i >= f.deck.length) f.i = Math.max(0, f.deck.length - 1);
+  const total = f.deck.length;
+  const known = f.deck.filter(id => S.progress[id] === 'known').length;
+  let body;
+  if (!total) {
+    body = `<div class="notice"><h3>Nothing to study here</h3><p>${o.hideKnown ? 'Every card in this selection is marked as known. Turn off "Hide known" to see them again.' : 'This topic and source has no questions.'}</p></div>`;
+  } else if (f.done) {
+    const learning = f.deck.filter(id => S.progress[id] === 'again').length;
+    body = `<div class="setup">
+      <h2>Deck finished</h2>
+      <p class="sub">${known} of ${total} marked as known${learning ? `, ${learning} still being learned` : ''}.</p>
+      <div class="summary">
+        <button class="btn" data-act="fc-back">Back to last card</button>
+        <button class="btn primary" data-act="fc-restart">Go through it again</button>
+        ${total - known > 0 ? '<button class="btn" data-act="fc-review">Only cards I don\'t know yet</button>' : ''}
+      </div></div>`;
+  } else {
+    const q = S.map.get(f.deck[f.i]);
+    body = `
+    <div class="prog"><span class="mono">Card ${f.i + 1} / ${total}</span><span class="prog-r"><span class="mono">${known} known</span>${flagBtn(q.id)}</span></div>
+    <div class="bar"><i style="width:${(f.i / total) * 100}%"></i></div>
+    <div class="card3d" id="card" role="button" tabindex="0" aria-label="Flip card" data-act="flip">
+      <div class="card${f.flipped ? ' flipped' : ''}" id="cardInner">
+        <div class="face front" aria-hidden="${f.flipped}">
+          <div class="face-top"><span class="mono">${qlabel(q)}</span><span class="tags">${flagChip(q.id)}${q.topic ? `<span class="topic">${esc(q.topic)}</span>` : ''}${srcChip(q)}</span></div>
+          <div class="face-body"><p class="big">${esc(q.q)}</p></div>
+          <div class="face-foot">Tap or press space to reveal</div>
+        </div>
+        <div class="face back" aria-hidden="${!f.flipped}">
+          <div class="face-top"><span class="mono">Answer</span><span class="tags">${flagChip(q.id)}${q.topic ? `<span class="topic">${esc(q.topic)}</span>` : ''}${srcChip(q)}</span></div>
+          <div class="face-body"><p class="big">${esc(q.a)}</p>${q.note ? `<p class="note">${esc(q.note)}</p>` : ''}</div>
+          <div class="face-foot">${qlabel(q)}</div>
+        </div>
+      </div>
+    </div>
+    <div class="fc-nav">
+      <button class="btn arrow" data-act="fc-prev" aria-label="Previous card" title="Previous card (left arrow)" ${f.i === 0 ? 'disabled' : ''}>${ARROW_L}</button>
+      <button class="btn" data-act="flip">Flip <span class="kbd">space</span></button>
+      <button class="btn arrow" data-act="fc-next" aria-label="${f.i === total - 1 ? 'Finish deck' : 'Next card'}" title="Next card (right arrow)">${ARROW_R}</button>
+    </div>
+    <p class="nav-hint">← → to move between cards</p>
+    <div class="fc-grade">
+      <button class="btn learn" data-act="fc-mark" data-v="again">Still learning <span class="kbd">1</span></button>
+      <button class="btn good" data-act="fc-mark" data-v="known">Got it <span class="kbd">2</span></button>
+    </div>`;
+  }
+  view.innerHTML = `<section>
+    <div class="opts">
+      <div class="field"><span>Topic</span><select id="fc-topic">${topicOptions(o.topic)}</select></div>
+      <div class="field"><span>Source</span><select id="fc-source">${sourceOptions(o.source, o.topic)}</select></div>
+      <label class="check"><input type="checkbox" id="fc-shuffle" ${o.shuffle ? 'checked' : ''}> Shuffle</label>
+      <label class="check"><input type="checkbox" id="fc-hide" ${o.hideKnown ? 'checked' : ''}> Hide known</label>
+      <label class="check"><input type="checkbox" id="fc-flag" ${o.flagOnly ? 'checked' : ''} ${flagCount() || o.flagOnly ? '' : 'disabled'}> Flagged only (${flagCount()})</label>
+    </div>${body}</section>`;
+}
+function fcFlip() {
+  const f = S.fc; if (!f || f.done) return;
+  const inner = $('#cardInner'); if (!inner) return;
+  f.flipped = !f.flipped;
+  inner.classList.toggle('flipped', f.flipped);
+  const faces = inner.querySelectorAll('.face');
+  faces[0].setAttribute('aria-hidden', String(f.flipped));
+  faces[1].setAttribute('aria-hidden', String(!f.flipped));
+}
+function fcGo(delta) {
+  const f = S.fc; if (!f) return;
+  const n = f.i + delta;
+  if (n < 0) return;
+  if (n >= f.deck.length) f.done = true; else { f.i = n; f.flipped = false; }
+  renderFlash(); const c = $('#card'); if (c) c.focus({ preventScroll: true });
+}
+function fcMark(v) {
+  const f = S.fc; if (!f || f.done || !f.deck.length) return;
+  S.progress[f.deck[f.i]] = v; touch(f.deck[f.i]);
+  fcGo(1);
+}
+
+/* ---------- quiz ---------- */
+const isYesNo = q => /^(yes|no)\b/i.test(q.a) && !(q.wrong && q.wrong.length);
+function buildChoices(q, pool) {
+  if (isYesNo(q)) return { choices: ['Yes', 'No'], correctIdx: /^yes/i.test(q.a) ? 0 : 1 };
+  let wrongs = shuffle((q.wrong || []).filter(w => w && w !== q.a)).slice(0, 3);
+  if (wrongs.length < 3 && !q.exact) {
+    const others = shuffle(pool.filter(x => x.id !== q.id && x.a !== q.a));
+    const same = others.filter(x => q.topic && x.topic === q.topic);
+    const rest = others.filter(x => !(q.topic && x.topic === q.topic));
+    for (const x of same.concat(rest)) {
+      if (wrongs.length >= 3) break;
+      if (!wrongs.includes(x.a)) wrongs.push(x.a);
+    }
+  }
+  const choices = shuffle([q.a].concat(wrongs));
+  return { choices, correctIdx: choices.indexOf(q.a) };
+}
+function qzItem(q, retry) { return Object.assign({ id: q.id, q: q.q, a: q.a, note: q.note, topic: q.topic, source: q.source, picked: null, retry: retry || 0 }, buildChoices(q, S.qs)); }
+/* a question with "exact": true keeps only the options it was written with */
+
+/* Reinforcement: a missed question is re-asked RETRY_GAP questions later (up to RETRY_MAX times),
+   and remembered in this browser as "weak" until it has been answered correctly twice in a row. */
+const RETRY_GAP = 3, RETRY_MAX = 3;
+const isWeak = id => { const t = S.stats[id]; return !!(t && t.w > 0 && t.s < 2); };
+const weakCount = () => S.qs.filter(q => isWeak(q.id)).length;
+function recordStat(id, ok, first) {
+  const t = S.stats[id] || (S.stats[id] = { w: 0, s: 0 });
+  if (ok) t.s++; else { t.s = 0; if (first) t.w++; }
+  touch(id);
+}
+function qzPool() {
+  const o = S.qzOpts;
+  return S.qs.filter(q => (o.topic === 'all' || q.topic === o.topic) && (o.source === 'all' || q.source === o.source) && (!o.weakOnly || isWeak(q.id)) && (!o.flagOnly || S.flags[q.id]));
+}
+function newQuiz(list) {
+  return { phase: 'run', items: list.map(q => qzItem(q)), i: 0, score: 0, total: list.length, missed: [], cleared: {}, repeat: S.qzOpts.repeat !== false };
+}
+
+function renderQuiz() {
+  setWide(false);
+  if (!S.loaded) { view.innerHTML = '<div class="skel"></div>'; return; }
+  if (!S.qs.length) { view.innerHTML = emptyBank('The quiz'); return; }
+  const z = S.qz;
+  if (!z || z.phase === 'setup') return renderQuizSetup();
+  if (z.phase === 'run') return renderQuizRun();
+  return renderQuizDone();
+}
+function renderQuizSetup() {
+  const o = S.qzOpts;
+  if (o.topic !== 'all' && !topics().includes(o.topic)) o.topic = 'all';
+  if (o.source !== 'all' && !sources().includes(o.source)) o.source = 'all';
+  const weak = weakCount();
+  if (o.weakOnly && !weak) o.weakOnly = false;
+  const nFlag = flagCount();
+  if (o.flagOnly && !nFlag) o.flagOnly = false;
+  const avail = qzPool().length;
+  const counts = [5, 10, 20, 50, 100].filter(n => n < avail);
+  const eff = o.count === 'all' || o.count >= avail ? 'all' : o.count;
+  const shown = eff === 'all' ? avail : eff;
+  view.innerHTML = `<section class="setup">
+    <h2>Multiple choice quiz</h2>
+    <div class="field"><span>Topic</span><select id="qz-topic">${topicOptions(o.topic)}</select></div>
+    <div class="field"><span>Source</span><select id="qz-source">${sourceOptions(o.source, o.topic)}</select></div>
+    <div class="field"><span>Questions from</span>
+      <div class="seg" role="group" aria-label="Question source">
+        <button data-act="qz-src" data-v="all" aria-pressed="${!o.weakOnly && !o.flagOnly}">Whole bank</button>
+        <button data-act="qz-src" data-v="weak" aria-pressed="${!!o.weakOnly}" ${weak ? '' : 'disabled'}>My weak questions (${weak})</button>
+        <button data-act="qz-src" data-v="flag" aria-pressed="${!!o.flagOnly}" ${nFlag ? '' : 'disabled'}>My flagged questions (${nFlag})</button>
+      </div></div>
+    <div class="field"><span>Number of questions</span>
+      <div class="seg" role="group" aria-label="Number of questions">
+        ${counts.map(n => `<button data-act="qz-count" data-n="${n}" aria-pressed="${eff === n}">${n}</button>`).join('')}
+        <button data-act="qz-count" data-n="all" aria-pressed="${eff === 'all'}">All (${avail})</button>
+      </div></div>
+    <div class="field"><label for="qz-custom"><span>Or type your own number (1 to ${avail})</span></label>
+      <input id="qz-custom" class="numin" type="number" inputmode="numeric" min="1" max="${avail}" step="1" value="${shown}" ${avail < 1 ? 'disabled' : ''}></div>
+    <label class="check"><input type="checkbox" id="qz-repeat" ${o.repeat !== false ? 'checked' : ''}> Bring missed questions back a few questions later (up to 3 times)</label>
+    ${weak ? '<div><button class="btn small ghost" data-act="qz-clearweak">Clear weak list</button></div>' : ''}
+    ${avail < 2 && !o.weakOnly ? '<p class="msg err">Add at least two questions to build answer options.</p>' : ''}
+    <button class="btn primary wide" id="qz-start" data-act="qz-start" ${avail < 1 ? 'disabled' : ''}>Start quiz (${shown} question${shown === 1 ? '' : 's'})</button>
+  </section>`;
+}
+function qzAvail() { return qzPool().length; }
+function qzSyncSetup(keepInput) {
+  const avail = qzAvail(), o = S.qzOpts;
+  const eff = o.count === 'all' || o.count >= avail ? 'all' : o.count;
+  const shown = eff === 'all' ? avail : eff;
+  view.querySelectorAll('[data-act="qz-count"]').forEach(b => {
+    const v = b.dataset.n === 'all' ? 'all' : parseInt(b.dataset.n, 10);
+    b.setAttribute('aria-pressed', String(v === eff));
+  });
+  const inp = $('#qz-custom'); if (inp && !keepInput) inp.value = shown;
+  const st = $('#qz-start'); if (st) st.textContent = `Start quiz (${shown} question${shown === 1 ? '' : 's'})`;
+}
+function qzStart() {
+  const o = S.qzOpts;
+  let pool = shuffle(qzPool());
+  if (o.count !== 'all') pool = pool.slice(0, o.count);
+  if (!pool.length) return;
+  S.qz = newQuiz(pool);
+  renderQuiz();
+}
+function renderQuizRun() {
+  const z = S.qz, it = z.items[z.i], n = z.items.length, answered = it.picked != null;
+  const ok = it.picked === it.correctIdx;
+  const queued = z.items.slice(z.i + 1).filter(x => x.retry).length;
+  /* repeats of missed questions are not new questions: the count only ever covers the questions the quiz started with */
+  const total = z.total;
+  const num = Math.min(total, z.items.slice(0, z.i + 1).filter(x => !x.retry).length);
+  const answeredOrig = z.items.filter(x => !x.retry && x.picked != null).length;
+  const unanswered = z.items.filter(x => x.picked == null).length;
+  const last = z.i === n - 1;
+  const nextLabel = !answered ? 'Skip' : (last ? (unanswered ? `Go to skipped (${unanswered})` : 'See results') : 'Next question');
+  const canNext = !last || answered || unanswered > 1;
+  setWide(total > 1);
+  view.innerHTML = `<section class="qz-layout"><div class="qz-main">
+    <div class="prog"><span class="mono">${it.retry ? 'Retry · question' : 'Question'} ${num} / ${total}${queued ? ` · ${queued} to retry` : ''}</span>${flagBtn(it.id)}</div>
+    <div class="bar"><i style="width:${total ? answeredOrig / total * 100 : 0}%"></i></div>
+    <article class="qcard">
+      <div class="face-top"><span class="mono">${qlabel(it)}</span><span class="tags">${flagChip(it.id)}${it.topic ? `<span class="topic">${esc(it.topic)}</span>` : ''}${srcChip(it)}${it.retry ? '<span class="tag-retry">Retry</span>' : ''}</span></div>
+      <div class="qcard-body">
+        <h2 class="qtitle">${esc(it.q)}</h2>
+        <div class="choices" role="group" aria-label="Answer choices">
+          ${it.choices.map((c, i) => {
+            let cls = '';
+            if (answered) cls = i === it.correctIdx ? ' is-right' : (i === it.picked ? ' is-wrong' : ' is-dim');
+            return `<button class="choice${cls}" data-act="pick" data-i="${i}" ${answered ? 'disabled' : ''}><span class="key">${'ABCDEF'[i]}</span><span class="ctext">${esc(c)}</span></button>`;
+          }).join('')}
+        </div>
+        ${answered ? `<div class="feedback${ok ? '' : ' no'}" role="status"><strong>${ok ? (it.retry ? 'Correct, cleared' : 'Correct') : 'Not quite'}</strong>${ok ? '' : `<span>The answer is ${esc(it.a)}.</span>`}${!ok && it.requeued ? '<span>This question will come back a little later.</span>' : ''}${it.note ? `<span>${esc(it.note)}</span>` : ''}</div>
+` : ''}
+      </div>
+    </article>
+    <div class="qz-nav">
+      <button class="btn arrow" id="qz-prev" data-act="qz-prev" aria-label="Previous question" title="Previous question (left arrow)" ${z.i === 0 ? 'disabled' : ''}>${ARROW_L}</button>
+      <button class="btn${answered ? ' primary' : ''}" id="qz-next" data-act="qz-next" ${canNext ? '' : 'disabled'} title="${answered ? 'Next question' : 'Skip for now'} (right arrow)">${nextLabel} ${ARROW_R.replace('<svg', '<svg width="18" height="18"')}</button>
+    </div>
+  </div>${total > 1 ? qzMapHtml(z, it) : ''}</section>`;
+  if (answered) { const b = $('#qz-next'); if (b) b.focus({ preventScroll: true }); }
+}
+/* one box per original question (the repeats of missed questions share the box of the question they repeat) */
+function qzMapHtml(z, it) {
+  const boxes = [];
+  z.items.forEach((x, idx) => { if (!x.retry) boxes.push({ x, idx }); });
+  return `<aside class="qz-map" aria-label="Question map"><div class="qz-grid">${boxes.map(({ x, idx }, k) => {
+    const st = x.picked == null ? '' : (x.picked === x.correctIdx ? 'ok' : 'no');
+    const word = (st === 'ok' ? 'answered correctly' : st === 'no' ? 'answered incorrectly' : 'not answered yet') + (S.flags[x.id] ? ', flagged' : '');
+    return `<button type="button" class="qz-dot${st ? ' ' + st : ''}${S.flags[x.id] ? ' fl' : ''}" data-act="qz-jump" data-idx="${idx}" ${x.id === it.id ? 'aria-current="step"' : ''} aria-label="Question ${k + 1}, ${word}">${k + 1}</button>`;
+  }).join('')}</div></aside>`;
+}
+function qzJump(idx) {
+  const z = S.qz; if (!z || z.phase !== 'run' || !(idx >= 0 && idx < z.items.length)) return;
+  z.i = idx; renderQuizRun(); window.scrollTo(0, 0);
+}
+/* the quiz page is wider than the other pages so the question map can sit to the right of the question */
+function setWide(on) { const a = $('.app'); if (a) a.classList.toggle('qz-run', !!on); }
+function qzPick(i) {
+  const z = S.qz; if (!z || z.phase !== 'run') return;
+  const it = z.items[z.i]; if (it.picked != null || i >= it.choices.length) return;
+  it.picked = i;
+  const ok = i === it.correctIdx, first = !it.retry;
+  recordStat(it.id, ok, first);
+  if (ok) {
+    if (first) z.score++; else z.cleared[it.id] = true;
+  } else {
+    S.progress[it.id] = 'again'; touch(it.id);
+    if (first) z.missed.push({ id: it.id, q: it.q, a: it.a, topic: it.topic, source: it.source });
+    const src = S.map.get(it.id);
+    if (z.repeat && src && it.retry < RETRY_MAX) {
+      const at = Math.min(z.items.length, z.i + 1 + RETRY_GAP);
+      z.items.splice(at, 0, qzItem(src, it.retry + 1));
+      it.requeued = true;
+    }
+  }
+  renderQuizRun();
+}
+/* move through the quiz: back to look at an earlier question, forward to the next one, or skip one and come back to it */
+function qzGo(delta) {
+  const z = S.qz; if (!z || z.phase !== 'run') return;
+  const n = z.items.length;
+  if (delta < 0) { if (z.i === 0) return; z.i--; renderQuizRun(); window.scrollTo(0, 0); return; }
+  if (z.i < n - 1) { z.i++; renderQuizRun(); window.scrollTo(0, 0); return; }
+  /* at the last question: finish when everything is answered, otherwise jump to the first skipped one */
+  const skipped = z.items.findIndex(x => x.picked == null);
+  if (skipped >= 0) {
+    if (skipped === z.i) return; /* this is the only question left: answer it first */
+    z.i = skipped; renderQuizRun(); window.scrollTo(0, 0); return;
+  }
+  z.phase = 'done'; renderQuiz(); window.scrollTo(0, 0);
+}
+function qzNext() { qzGo(1); }
+function renderQuizDone() {
+  const z = S.qz, n = z.total, missed = z.missed;
+  const pct = n ? Math.round(z.score / n * 100) : 0;
+  const cleared = missed.filter(m => z.cleared[m.id]).length;
+  const weak = weakCount();
+  view.innerHTML = `<section class="setup">
+    <h2>Results</h2>
+    <div class="score-big">${z.score}<small> / ${n}</small></div>
+    <p class="sub">${pct}% correct first time${missed.length ? `. ${missed.length} missed${z.repeat ? `, ${cleared} cleared on retry` : ''}.` : '. Nothing missed.'}</p>
+    ${missed.length ? `<ul class="missed">${missed.map(m => `<li><span class="qmeta"><span class="mono">${qlabel(m)}${z.repeat ? (z.cleared[m.id] ? ' · cleared on retry' : ' · still to learn') : ''}</span>${srcChip(m)}</span><strong>${esc(m.q)}</strong><span class="atext"><span class="lbl">ANS</span>${esc(m.a)}</span></li>`).join('')}</ul>` : ''}
+    <div class="summary">
+      ${missed.length ? '<button class="btn primary" data-act="qz-retry">Retry missed</button>' : ''}
+      ${weak ? `<button class="btn" data-act="qz-weak">Practise weak questions (${weak})</button>` : ''}
+      <button class="btn${missed.length || weak ? '' : ' primary'}" data-act="qz-new">New quiz</button>
+    </div></section>`;
+}
+
+/* ---------- events ---------- */
+const actions = {
+  mode: b => setMode(b.dataset.mode),
+  'ed-new': () => {
+    if (!S.canWrite) return;
+    if (S.mode !== 'library') setMode('library');
+    S.edit = { id: 'new', d: edBlank(), msg: '', busy: false }; updateLibrary();
+    const w = $('.edwrap'); if (w) w.scrollIntoView({ block: 'nearest' }); edFocus('q');
+  },
+  'ed-edit': b => {
+    if (!S.canWrite) return;
+    const q = S.map.get(b.dataset.id); if (!q) return;
+    S.edit = { id: q.id, d: edFromDoc(q), msg: '', busy: false }; updateLibrary(); edFocus('q', true);
+  },
+  'ed-cancel': () => {
+    const id = S.edit && S.edit.id; S.edit = null; updateLibrary();
+    if (id && id !== 'new') { const li = $('[data-qid="' + id + '"]'); if (li) li.scrollIntoView({ block: 'nearest' }); }
+  },
+  'open-import': () => {
+    if (S.mode !== 'library') { S.importOpen = true; setMode('library'); return; }
+    S.importOpen = true; const p = $('#import'); if (p) { p.hidden = false; $('#importText').focus(); p.scrollIntoView({ block: 'nearest' }); }
+  },
+  'close-import': () => { S.importOpen = false; $('#import').hidden = true; },
+  'do-import': doImport,
+  export: exportJson,
+  del: b => arm(b, 'Confirm', async () => {
+    try { await store.remove([b.dataset.id]); toast('Question deleted'); } catch (e) { toast(e.message || 'Could not delete'); }
+  }),
+  'rm-examples': b => arm(b, 'Confirm removal', async () => {
+    try { await store.remove(S.qs.filter(q => q.sample).map(q => q.id)); toast('Examples removed'); } catch (e) { toast(e.message || 'Could not remove'); }
+  }),
+  flip: () => fcFlip(),
+  'fc-prev': () => { if (S.fc && !S.fc.done && S.fc.i > 0) { S.fc.i--; S.fc.flipped = false; renderFlash(); const c = $('#card'); if (c) c.focus({ preventScroll: true }); } },
+  'fc-back': () => { if (S.fc && S.fc.done) { S.fc.done = false; S.fc.i = Math.max(0, S.fc.deck.length - 1); S.fc.flipped = false; renderFlash(); } },
+  'fc-next': () => fcGo(1),
+  'fc-mark': b => fcMark(b.dataset.v),
+  'fc-restart': () => { fcBuild(); renderFlash(); },
+  'fc-review': () => { S.fcOpts.hideKnown = true; fcBuild(); renderFlash(); },
+  'qz-count': b => { S.qzOpts.count = b.dataset.n === 'all' ? 'all' : parseInt(b.dataset.n, 10); qzSyncSetup(false); },
+  'qz-start': qzStart,
+  pick: b => qzPick(parseInt(b.dataset.i, 10)),
+  'qz-next': qzNext,
+  'qz-prev': () => qzGo(-1),
+  'qz-jump': b => qzJump(parseInt(b.dataset.idx, 10)),
+  flag: b => toggleFlag(b.dataset.id),
+  'lib-flagfilter': () => { S.flagOnly = !S.flagOnly; updateLibrary(); },
+  'qz-retry': () => {
+    const items = S.qz.missed.map(m => S.map.get(m.id)).filter(Boolean);
+    if (!items.length) { S.qz = null; renderQuiz(); return; }
+    S.qz = newQuiz(shuffle(items)); renderQuiz();
+  },
+  'qz-weak': () => { S.qzOpts.weakOnly = true; S.qzOpts.flagOnly = false; S.qz = null; renderQuiz(); window.scrollTo(0, 0); },
+  'qz-src': b => { S.qzOpts.weakOnly = b.dataset.v === 'weak'; S.qzOpts.flagOnly = b.dataset.v === 'flag'; renderQuizSetup(); },
+  'qz-clearweak': b => arm(b, 'Confirm clear', () => {
+    const old = Object.keys(S.stats); S.stats = {}; old.forEach(touch); saveStudy(); S.qzOpts.weakOnly = false; renderQuizSetup(); toast('Weak list cleared');
+  }),
+  'qz-new': () => { S.qz = null; renderQuiz(); }
+};
+view.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  const fn = actions[b.dataset.act]; if (fn) fn(b, e);
+});
+document.addEventListener('click', e => {
+  const b = e.target.closest('.tab[data-act]'); if (b) actions.mode(b);
+});
+view.addEventListener('submit', e => {
+  if (e.target.matches && e.target.matches('[data-editor]')) { e.preventDefault(); edSave(); }
+});
+view.addEventListener('keydown', e => {
+  if (!S.edit || !e.target.closest || !e.target.closest('.editor')) return;
+  if (e.key === 'Escape') { e.preventDefault(); actions['ed-cancel'](); }
+  else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); edSave(); }
+});
+view.addEventListener('input', e => {
+  if (S.edit && e.target.closest && e.target.closest('.editor') && e.target.name) {
+    const m = /^w(\d+)$/.exec(e.target.name);
+    if (m) S.edit.d.wr[parseInt(m[1], 10)] = e.target.value; else S.edit.d[e.target.name] = e.target.value;
+    return;
+  }
+  if (e.target.id === 'search') { S.search = e.target.value; updateLibrary(); }
+  else if (e.target.id === 'qz-custom') {
+    const n = parseInt(e.target.value, 10), avail = qzAvail();
+    if (!isNaN(n) && n >= 1) { S.qzOpts.count = Math.min(n, avail); qzSyncSetup(true); }
+  }
+});
+view.addEventListener('change', e => {
+  const id = e.target.id;
+  if (S.edit && e.target.closest && e.target.closest('.editor') && e.target.name === 'source') { S.edit.d.source = e.target.value; return; }
+  if (id === 'topic') { S.topic = e.target.value; updateLibrary(); }
+  else if (id === 'source') { S.srcFilter = e.target.value; updateLibrary(); }
+  else if (id === 'fc-topic') { S.fcOpts.topic = e.target.value; fcBuild(); renderFlash(); }
+  else if (id === 'fc-source') { S.fcOpts.source = e.target.value; fcBuild(); renderFlash(); }
+  else if (id === 'fc-shuffle') { S.fcOpts.shuffle = e.target.checked; fcBuild(); renderFlash(); }
+  else if (id === 'fc-hide') { S.fcOpts.hideKnown = e.target.checked; fcBuild(); renderFlash(); }
+  else if (id === 'fc-flag') { S.fcOpts.flagOnly = e.target.checked; fcBuild(); renderFlash(); }
+  else if (id === 'qz-topic') { S.qzOpts.topic = e.target.value; renderQuizSetup(); }
+  else if (id === 'qz-source') { S.qzOpts.source = e.target.value; renderQuizSetup(); }
+  else if (id === 'qz-custom') { qzSyncSetup(false); }
+  else if (id === 'qz-repeat') { S.qzOpts.repeat = e.target.checked; }
+  else if (id === 'importFile') {
+    const file = e.target.files && e.target.files[0]; if (!file) return;
+    const r = new FileReader();
+    r.onload = () => { $('#importText').value = String(r.result || ''); $('#importMsg').textContent = 'Loaded ' + file.name + '. Press Add to bank.'; };
+    r.readAsText(file); e.target.value = '';
+  }
+});
+document.addEventListener('keydown', e => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  if (e.target.closest && e.target.closest('input,textarea,select')) return;
+  const onButton = e.target.closest && e.target.closest('button');
+  if (S.mode === 'flashcards' && S.fc && S.fc.done) {
+    if (e.key === 'ArrowLeft') { e.preventDefault(); actions['fc-back'](); }
+  } else if (S.mode === 'flashcards' && S.fc && !S.fc.done && S.fc.deck.length) {
+    if ((e.key === ' ' || e.key === 'Enter') && !onButton) { e.preventDefault(); fcFlip(); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); fcGo(1); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); actions['fc-prev'](); }
+    else if (e.key.toLowerCase() === 'f') toggleFlag(S.fc.deck[S.fc.i]);
+    else if (e.key === '1') fcMark('again');
+    else if (e.key === '2') fcMark('known');
+  } else if (S.mode === 'quiz' && S.qz && S.qz.phase === 'run') {
+    const it = S.qz.items[S.qz.i];
+    const k = e.key.toLowerCase();
+    if (e.key === 'ArrowRight') { e.preventDefault(); qzGo(1); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); qzGo(-1); }
+    else if (k === 'f') toggleFlag(it.id);
+    else if (it.picked == null) {
+      const idx = /^[1-6]$/.test(k) ? parseInt(k, 10) - 1 : 'abcdef'.indexOf(k);
+      if (k.length === 1 && idx >= 0) qzPick(idx);
+    }
+  }
+});
+
+/* ---------- boot ---------- */
+async function init() {
+  const h = (location.hash || '').slice(1);
+  if (MODES.includes(h)) S.mode = h;
+  render();
+  const claude = window.claude;
+  let user = null;
+  try { if (claude && claude.use) db = await claude.use('db'); } catch (e) { db = null; }
+  try { if (claude && claude.use) user = await claude.use('user'); } catch (e) { user = null; }
+  if (user) { try { if ((await user.can('data.write')) === false) S.canWrite = false; } catch (e) {} }
+  let me = null;
+  if (user && db) { try { me = await user.me(); } catch (e) { me = null; } }
+  if (me && me.id) {
+    adoptLocal(me.id); study.name = me.name || '';
+    try { study.col = db.collection('data/users/' + me.id); startStudySync(); } catch (e) { study.ok = false; }
+  }
+  renderWho();
+  const useLocal = () => { db = null; S.source = 'local'; S.qs = loadLocalQuestions(); S.loaded = true; refresh(); };
+  if (!db) { useLocal(); return; }
+  S.source = 'shared';
+  db.collection('questions').onSnapshot(snap => {
+    S.qs = snap.docs.map(d => fixSource(Object.assign({ id: d.id }, d.data()))).sort((a, b) => idNum(a.id) - idNum(b.id) || a.id.localeCompare(b.id));
+    S.loaded = true; refresh();
+  }, err => {
+    useLocal(); toast('Could not load the saved questions. Showing this browser\'s copy.');
+  });
+}
+init();
+})();
+</script>
+</body></html>
